@@ -20,12 +20,12 @@ namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling;
 
 use GuzzleHttp\Cookie\SetCookie;
 use PHPUnit\Util\PHP\AbstractPhpProcess;
+use Psr\Http\Message\ResponseInterface;
 use SebastianBergmann\Template\Template;
-use Text_Template;
+use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Http\ResponseFactory;
+use TYPO3\CMS\Core\Http\Stream;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
-use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalResponse;
-use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalResponseException;
-use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\Response;
 use TYPO3\TestingFramework\Core\Testbase;
 
 trait Typo3RequestAwareTestTrait
@@ -33,30 +33,30 @@ trait Typo3RequestAwareTestTrait
     public function fetchFrontendPageContens(
         ExtendedInternalRequest $request,
         bool $followRedirects = true,
-        InternalRequestContext $requestContext = null
+        InternalRequestContext $requestContext = null,
     ): array {
-        $requestContext = $requestContext ?? $this->buildRequestContext();
+        $requestContext = $requestContext ?? (new InternalRequestContext());
         $responseData = $this->executeRequest($request, $requestContext, false, $followRedirects);
 
         return [
             'response' => $responseData['response'],
             'cookieData' => $responseData['cookieData'],
-            'pageMarkup' => (string)$responseData['response']->getBody()
+            'pageMarkup' => (string) $responseData['response']->getBody(),
         ];
     }
 
     public function fetchBackendPageContens(
         ExtendedInternalRequest $request,
         bool $followRedirects = true,
-        InternalRequestContext $requestContext = null
+        InternalRequestContext $requestContext = null,
     ): array {
-        $requestContext = $requestContext ?? $this->buildRequestContext();
+        $requestContext = $requestContext ?? (new InternalRequestContext());
         $responseData = $this->executeRequest($request, $requestContext, true, $followRedirects);
 
         return [
             'response' => $responseData['response'],
             'cookieData' => $responseData['cookieData'],
-            'pageMarkup' => (string)$responseData['response']->getBody()
+            'pageMarkup' => (string) $responseData['response']->getBody(),
         ];
     }
 
@@ -69,7 +69,7 @@ trait Typo3RequestAwareTestTrait
         ?string $uri = null,
         array $postData = [],
         array $queryParameters = [],
-        array $cookieData = []
+        array $cookieData = [],
     ): ExtendedInternalRequest {
         return $this->buildGetRequest($uri, $cookieData)
             ->withMethod('POST')
@@ -77,21 +77,13 @@ trait Typo3RequestAwareTestTrait
             ->withQueryParameters($queryParameters);
     }
 
-    public function buildRequestContext(array $globalSettings = []): InternalRequestContext
-    {
-        return (new InternalRequestContext())->withGlobalSettings(array_replace_recursive(
-            ['TYPO3_CONF_VARS' => self::DEFAULT_TYPO3_CONF_VARS],
-            $globalSettings
-        ));
-    }
-
     private function executeRequest(
         ExtendedInternalRequest $request,
         InternalRequestContext $requestContext = null,
         bool $isBackendRequest = false,
-        bool $followRedirects = true
+        bool $followRedirects = true,
     ): array {
-        $requestContext = $requestContext ?? $this->buildRequestContext();
+        $requestContext = $requestContext ?? (new InternalRequestContext());
 
         $cookieData = $request->getCookieParams();
         $locationHeaders = [];
@@ -102,25 +94,29 @@ trait Typo3RequestAwareTestTrait
             $locationHeader = $response->getHeaderLine('location');
             if (in_array($locationHeader, $locationHeaders, true)) {
                 self::fail(
-                    implode(LF . '* ', array_merge(
-                        ['Redirect loop detected:'],
-                        $locationHeaders,
-                        [$locationHeader]
-                    ))
+                    implode(
+                        LF . '* ',
+                        array_merge(
+                            ['Redirect loop detected:'],
+                            $locationHeaders,
+                            [$locationHeader],
+                        ),
+                    ),
                 );
             }
             $locationHeaders[] = $locationHeader;
 
-            $cookies = array_map(fn (string $cookie): SetCookie => SetCookie::fromString($cookie), $response->getHeader('Set-Cookie'));
+            $cookies = array_map(fn(string $cookie): SetCookie => SetCookie::fromString($cookie),
+                $response->getHeader('Set-Cookie'));
             $cookieData = array_filter(
                 array_replace_recursive(
                     $cookieData,
                     array_combine(
-                        array_map(fn (SetCookie $cookie): string => $cookie->getName(), $cookies),
-                        array_map(fn (SetCookie $cookie): string => $cookie->getValue(), $cookies)
-                    )
+                        array_map(fn(SetCookie $cookie): string => $cookie->getName(), $cookies),
+                        array_map(fn(SetCookie $cookie): string => $cookie->getValue(), $cookies),
+                    ),
                 ),
-                fn (string $value): bool => $value !== 'deleted'
+                fn(string $value): bool => $value !== 'deleted',
             );
 
             $request = $this->buildGetRequest($locationHeader, $cookieData);
@@ -135,23 +131,18 @@ trait Typo3RequestAwareTestTrait
     private function retrieveRequestResult(
         ExtendedInternalRequest $request,
         InternalRequestContext $requestContext,
-        bool $isBackendRequest = false
+        bool $isBackendRequest = false,
     ): array {
         $arguments = [
             'request' => json_encode($request),
             'context' => json_encode($requestContext),
         ];
 
-        $templateClass = Text_Template::class;
-        if (!class_exists($templateClass)) {
-            $templateClass = Template::class;
-        }
-
         $templateFile = $isBackendRequest
-                  ? __DIR__ . '/Backend/request.tpl'
-                  : __DIR__ . '/Frontend/request.tpl';
+            ? __DIR__ . '/Backend/request.tpl'
+            : __DIR__ . '/Frontend/request.tpl';
 
-        $template = new $templateClass($templateFile);
+        $template = new Template($templateFile);
 
         $template->setVar([
             'arguments' => var_export($arguments, true),
@@ -164,7 +155,7 @@ trait Typo3RequestAwareTestTrait
         return $php->runJob($template->render());
     }
 
-    private function reconstituteRequestResult(array $result): InternalResponse
+    private function reconstituteRequestResult(array $result): ResponseInterface
     {
         if (!empty($result['stderr'])) {
             $this->fail('Response is erroneous: ' . LF . $result['stderr']);
@@ -175,17 +166,17 @@ trait Typo3RequestAwareTestTrait
             $this->fail('Response is empty: ' . LF . $result['stdout'] ?? '');
         }
 
-        if ($data['status'] === Response::STATUS_Failure) {
+        if ($data['status'] === 'failure') {
             try {
                 $exception = new $data['exception']['type'](
                     $data['exception']['message'],
-                    $data['exception']['code']
+                    $data['exception']['code'],
                 );
             } catch (\Throwable $throwable) {
-                $exception = new InternalResponseException(
-                    (string)$data['exception']['message'],
-                    (int)$data['exception']['code'],
-                    (string)$data['exception']['type']
+                $exception = new \Exception(
+                    (string) $data['exception']['message'],
+                    (int) $data['exception']['code'],
+                    (string) $data['exception']['type'],
                 );
             }
             throw $exception;
@@ -195,6 +186,12 @@ trait Typo3RequestAwareTestTrait
             self::fail('Response is empty: ' . LF . $data);
         }
 
-        return InternalResponse::fromArray($data['content']);
+        $responseFactory = new ResponseFactory();
+        $response = $responseFactory->createResponse();
+        $response->getBody()->write($data['content']);
+        foreach ($data['headers'] as $name => $value) {
+            $response = $response->withHeader($name, $value);
+        }
+        return $response;
     }
 }

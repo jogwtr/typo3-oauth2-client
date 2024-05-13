@@ -24,6 +24,8 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestCon
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\AbstractRequestBootstrap;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\ExtendedInternalRequest;
 
+use function json_decode;
+
 class RequestBootstrap extends AbstractRequestBootstrap
 {
     protected const ENTRY_LEVEL = 1;
@@ -47,9 +49,18 @@ class RequestBootstrap extends AbstractRequestBootstrap
             die('No request object given');
         }
 
-        $this->context = InternalRequestContext::fromArray(json_decode($this->requestArguments['context'], true));
-        $this->request = ExtendedInternalRequest::fromArray(json_decode($this->requestArguments['request'], true));
-
+        $context = json_decode($this->requestArguments['context'], true);
+        if (!empty($context)) {
+            $a = 'B';
+        } else {
+            $this->context = new InternalRequestContext();
+        }
+        $request = json_decode($this->requestArguments['request'], true);
+        if (!empty($request)) {
+            $a = 'B';
+        } else {
+            $this->request = new ExtendedInternalRequest();
+        }
         $requestUrlParts = parse_url((string)$this->request->getUri());
 
         // Populating $_GET and $_REQUEST is query part is set:

@@ -141,7 +141,7 @@ class BackendDataHandlingTest extends FunctionalTestCase
         self::assertEquals('new5', $backendUserOauth2ProviderConfigurations[6]['identifier'], 'assert: backend user oauth2 provider configuration (7) is valid');
     }
 
-    public function assertThatABackendUserIsUnableToCreateOAuth2BackendConfigurationsViaRecordCommitEndpointV10DataProvider(): \Generator
+    public static function assertThatABackendUserIsUnableToCreateOAuth2BackendConfigurationsViaRecordCommitEndpointV10DataProvider(): \Generator
     {
         yield 'oauth2test-create-be-1' => [
             'oauth2test-create-be-1',
@@ -491,7 +491,7 @@ class BackendDataHandlingTest extends FunctionalTestCase
         self::assertEquals('_invalid_', $frontendUserOauth2ProviderConfigurations[3]['identifier'], 'assert: frontend user oauth2 provider configuration (4) is valid');
     }
 
-    public function assertThatABackendUserWithoutFeUserEditRightsIsUnableToCreateOAuth2FrontendConfigurationsDataProvider(): \Generator
+    public static function assertThatABackendUserWithoutFeUserEditRightsIsUnableToCreateOAuth2FrontendConfigurationsDataProvider(): \Generator
     {
         yield 'user2' => [
             'userName' => 'user2',
@@ -528,7 +528,7 @@ class BackendDataHandlingTest extends FunctionalTestCase
         self::assertCount(0, $frontendUserOauth2ProviderConfigurations, 'assert: 0 oauth2 provider configuration exists for frontend users');
     }
 
-    public function assertThatABackendUserWithFeUserEditRightsIsUnableToCreateOAuth2FrontendConfigurationsDataProvider(): \Generator
+    public static function assertThatABackendUserWithFeUserEditRightsIsUnableToCreateOAuth2FrontendConfigurationsDataProvider(): \Generator
     {
         yield 'user4' => [
             'userName' => 'user4',
@@ -604,7 +604,7 @@ class BackendDataHandlingTest extends FunctionalTestCase
         self::assertCount(0, $frontendUserOauth2ProviderConfigurations, 'assert: 0 oauth2 provider configuration exists for frontend users');
     }
 
-    public function assertThatABackendUserWithoutFeUserEditRightsIsUnableToDeactivateOAuth2FrontendConfigurationsDataProvider(): \Generator
+    public static function assertThatABackendUserWithoutFeUserEditRightsIsUnableToDeactivateOAuth2FrontendConfigurationsDataProvider(): \Generator
     {
         yield 'user2' => [
             'userName' => 'user2',
@@ -639,7 +639,7 @@ class BackendDataHandlingTest extends FunctionalTestCase
         self::assertCount(2, $frontendUserOauth2ProviderConfigurations, 'assert: 2 oauth2 provider configuration exists for frontend users');
     }
 
-    public function assertThatABackendUserWithFeUserEditRightsIsAbleToDeactivateOAuth2FrontendConfigurationsDataProvider(): \Generator
+    public static function assertThatABackendUserWithFeUserEditRightsIsAbleToDeactivateOAuth2FrontendConfigurationsDataProvider(): \Generator
     {
         yield 'user4' => [
             'userName' => 'user4',

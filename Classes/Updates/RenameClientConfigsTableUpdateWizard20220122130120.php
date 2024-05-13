@@ -114,7 +114,7 @@ class RenameClientConfigsTableUpdateWizard20220122130120 implements UpgradeWizar
         $qb->getRestrictions()->removeByType(Oauth2BeUserProviderConfigurationRestriction::class);
 
         $result = $qb
-            ->select('uid', 'tstamp', 'crdate', 'cruser_id', 'parentid', 'provider', 'identifier')
+            ->select('uid', 'tstamp', 'crdate', 'parentid', 'provider', 'identifier')
             ->from(self::OAUTH2_LEGACY_CONFIG_TABLE)
             ->where(
                 $qb->expr()->and(

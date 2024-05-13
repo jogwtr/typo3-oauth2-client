@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Tests\Functional\Backend;
 
 use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use Waldhacker\Oauth2Client\Tests\Functional\Fixtures\InvalidAccessTokenResponseFromGitLabHttpMock;
 use Waldhacker\Oauth2Client\Tests\Functional\Fixtures\SuccessfulGetUserFromGitLabHttpMock;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\FormHandling\DataExtractor;
@@ -93,18 +94,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         $responseData = $this->fetchBackendPageContens(
             $registerVerifyForm->toPostRequest($this->buildGetRequest(null, $responseData['cookieData'])),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => [
-                        'id' => 'user1-gitlab2-be-remote-identity',
-                        'username' => 'user1-gitlab2-be',
-                        'name' => 'user1 gitlab2-be',
-                        'email' => 'user1-gitlab2-be@waldhacker.dev',
-                    ],
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $backendUserSessionData = $this->getBackendSessionDataByUser($backendUserUid);
@@ -139,7 +129,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         self::assertEquals(302, $responseData['response']->getStatusCode(), 'assert: response redirect code is set');
     }
 
-    public function assertThatABackendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToNotBeUsedWithinTheBackendDataProvider(): \Generator
+    public static function assertThatABackendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToNotBeUsedWithinTheBackendDataProvider(): \Generator
     {
         yield 'register with a frontend provider (gitlab4-fe)' => [
             'oauth2RegistrationUriId' => 'oauth2test-register-gitlab4-fe',
@@ -190,7 +180,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         self::assertEquals(401, $responseData['response']->getStatusCode(), 'assert: response redirect code is set');
     }
 
-    public function assertThatABackendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheBackendIfInvalidaDataIsSumbittedDataProvider(): \Generator
+    public static function assertThatABackendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheBackendIfInvalidaDataIsSumbittedDataProvider(): \Generator
     {
         yield 'all empty' => [
             'formData' => [
@@ -328,17 +318,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         $responseData = $this->fetchBackendPageContens(
             $registerVerifyForm->toPostRequest($this->buildGetRequest(null, $responseData['cookieData'])),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                'className' => $formData['oauth2-code'] === '_invalid' ? InvalidAccessTokenResponseFromGitLabHttpMock::class : SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => [
-                        'id' => 'user1-gitlab2-be-remote-identity',
-                        'username' => 'user1-gitlab2-be',
-                        'name' => 'user1 gitlab2-be',
-                        'email' => 'user1-gitlab2-be@waldhacker.dev',
-                    ],
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $backendUserSessionData = $this->getBackendSessionDataByUser($backendUserUid);
@@ -370,7 +350,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         self::assertEquals(302, $responseData['response']->getStatusCode(), 'assert: response redirect code is set');
     }
 
-    public function assertThatABackendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheBackendIfUserLoginIsExpiredBeforeRegisterActionDataProvider(): \Generator
+    public static function assertThatABackendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheBackendIfUserLoginIsExpiredBeforeRegisterActionDataProvider(): \Generator
     {
         yield 'session is expired' => [
             'expiredByCookie' => false,
@@ -434,7 +414,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         self::assertStringNotContainsString('toolbar-item-avatar', $responseData['pageMarkup'], 'assert: we are logged in');
     }
 
-    public function assertThatABackendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheBackendIfUserLoginIsExpiredBeforeVerifyActionDataProvider(): \Generator
+    public static function assertThatABackendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheBackendIfUserLoginIsExpiredBeforeVerifyActionDataProvider(): \Generator
     {
         yield 'session is expired' => [
             'expiredByCookie' => false,
@@ -517,18 +497,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         $responseData = $this->fetchBackendPageContens(
             $registerVerifyForm->toPostRequest($this->buildGetRequest(null, $responseData['cookieData'])),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => [
-                        'id' => 'user1-gitlab2-be-remote-identity',
-                        'username' => 'user1-gitlab2-be',
-                        'name' => 'user1 gitlab2-be',
-                        'email' => 'user1-gitlab2-be@waldhacker.dev',
-                    ],
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();

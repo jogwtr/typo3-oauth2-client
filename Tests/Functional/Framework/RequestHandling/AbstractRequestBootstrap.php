@@ -19,12 +19,13 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling;
 
 use Composer\Autoload\ClassLoader;
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Http\Application as BackendApplication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Frontend\Http\Application as FrontendApplication;
-use TYPO3\JsonResponse\GlobalStates;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 
 abstract class AbstractRequestBootstrap
@@ -58,33 +59,21 @@ abstract class AbstractRequestBootstrap
 
         ob_start();
         try {
-            $override = $this->context->getGlobalSettings() ?? [];
-            foreach ($override as $k => $v) {
-                if (isset($GLOBALS[$k])) {
-                    ArrayUtility::mergeRecursiveWithOverrule($GLOBALS[$k], $override[$k]);
-                } else {
-                    $GLOBALS[$k] = $override[$k];
-                }
-            }
-
             chdir($_SERVER['DOCUMENT_ROOT']);
             SystemEnvironmentBuilder::run(static::ENTRY_LEVEL, static::REQUEST_TYPE);
             $container = Bootstrap::init($this->classLoader);
-
-            $override = $this->context->getGlobalSettings() ?? [];
-            foreach ($GLOBALS as $k => $v) {
-                if (isset($override[$k])) {
-                    ArrayUtility::mergeRecursiveWithOverrule($GLOBALS[$k], $override[$k]);
-                }
-            }
 
             $applicationClass = static::REQUEST_TYPE === SystemEnvironmentBuilder::REQUESTTYPE_FE
                                 ? FrontendApplication::class
                                 : BackendApplication::class;
 
-            $container->get($applicationClass)->run();
+            /** @var ResponseInterface $response */
+            $response = $container->get($applicationClass)->handle(ServerRequestFactory::fromGlobals());
             $this->result['status'] = 'success';
-            $this->result['content'] = static::getContent();
+            $body = $response->getBody();
+            $body->rewind();
+            $this->result['content'] = $body->getContents();
+            $this->result['headers'] = $response->getHeaders();
         } catch (\Throwable $exception) {
             $this->result['error'] = $exception->__toString();
             $this->result['exception'] = [
@@ -104,7 +93,6 @@ abstract class AbstractRequestBootstrap
             $this->result['content'] = [
                 'statusCode' => 200,
                 'reasonPhrase' => '',
-                'headers' => GlobalStates::getHeaders(),
                 'body' => null,
             ];
         }

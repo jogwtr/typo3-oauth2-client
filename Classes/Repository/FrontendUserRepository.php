@@ -120,7 +120,6 @@ readonly class FrontendUserRepository
             ->setValue('pid', 0)
             ->setValue('crdate', $now->format('U'))
             ->setValue('tstamp', $now->format('U'))
-            ->setValue('cruser_id', $userid)
             ->setValue('parentid', $userid)
             ->setValue('provider', $provider)
             ->setValue('identifier', $identifier)

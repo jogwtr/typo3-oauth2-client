@@ -19,13 +19,14 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Tests\Functional\Frontend;
 
 use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use Waldhacker\Oauth2Client\Tests\Functional\Fixtures\InvalidAccessTokenResponseFromGitLabHttpMock;
 use Waldhacker\Oauth2Client\Tests\Functional\Fixtures\SuccessfulGetUserFromGitLabHttpMock;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\FunctionalTestCase;
 
 class FrontendRegistrationTest extends FunctionalTestCase
 {
-    public function assertThatAFrontendUserIsAbleToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsAbleToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendDataProvider(): \Generator
     {
         yield 'site1 EN with gitlab3-both' => [
             'oauth2RegistrationUriId' => 'oauth2test-register-gitlab3-both',
@@ -170,13 +171,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -205,7 +200,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         self::assertEquals(302, $responseData['response']->getStatusCode(), 'assert: response redirect code is set');
     }
 
-    public function assertThatAFrontendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToNotBeUsedWithinTheFrontendOrSiteDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToNotBeUsedWithinTheFrontendOrSiteDataProvider(): \Generator
     {
         yield 'site1 EN - register a backend provider (gitlab2-be)' => [
             'oauth2RegistrationUriId' => 'oauth2test-register-gitlab2-be',
@@ -393,10 +388,10 @@ class FrontendRegistrationTest extends FunctionalTestCase
         self::assertEquals(401, $responseData['response']->getStatusCode(), 'assert: response redirect code is set');
     }
 
-    public function assertThatAFrontendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendIfInvalidaDataIsSumbittedDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendIfInvalidaDataIsSumbittedDataProvider(): \Generator
     {
         yield 'all empty' => [
-            'formData' => [
+            'remoteRequestData' => [
                 'oauth2-provider' => '',
                 'oauth2-state' => '',
                 'oauth2-code' => '',
@@ -405,7 +400,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         ];
 
         yield 'empty provider' => [
-            'formData' => [
+            'remoteRequestData' => [
                 'oauth2-provider' => '',
                 'oauth2-state' => '_state',
                 'oauth2-code' => 'some-remote-api-access-code',
@@ -414,7 +409,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         ];
 
         yield 'empty state' => [
-            'formData' => [
+            'remoteRequestData' => [
                 'oauth2-provider' => 'gitlab3-both',
                 'oauth2-state' => '',
                 'oauth2-code' => 'some-remote-api-access-code',
@@ -423,7 +418,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         ];
 
         yield 'empty code' => [
-            'formData' => [
+            'remoteRequestData' => [
                 'oauth2-provider' => 'gitlab3-both',
                 'oauth2-state' => '_state',
                 'oauth2-code' => '',
@@ -432,7 +427,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         ];
 
         yield 'unknown provider' => [
-            'formData' => [
+            'remoteRequestData' => [
                 'oauth2-provider' => 'notconfigured',
                 'oauth2-state' => '_state',
                 'oauth2-code' => 'some-remote-api-access-code',
@@ -441,7 +436,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         ];
 
         yield 'invalid code' => [
-            'formData' => [
+            'remoteRequestData' => [
                 'oauth2-provider' => 'gitlab3-both',
                 'oauth2-state' => '_state',
                 'oauth2-code' => '_invalid',
@@ -450,7 +445,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         ];
 
         yield 'invalid session data' => [
-            'formData' => [
+            'remoteRequestData' => [
                 'oauth2-provider' => 'gitlab3-both',
                 'oauth2-state' => '_state',
                 'oauth2-code' => 'some-remote-api-access-code',
@@ -549,12 +544,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                'className' => $remoteRequestData['oauth2-code'] === '_invalid' ? InvalidAccessTokenResponseFromGitLabHttpMock::class : SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $frontendUserSessionData = $this->getFrontendSessionDataByUser($frontendUserUid);
@@ -669,13 +659,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -703,7 +687,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         self::assertEquals(302, $responseData['response']->getStatusCode(), 'assert: response redirect code is set');
     }
 
-    public function assertThatAFrontendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendIfUserLoginIsExpiredBeforeRegisterActionDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendIfUserLoginIsExpiredBeforeRegisterActionDataProvider(): \Generator
     {
         yield 'session is expired' => [
             'expiredByCookie' => false,
@@ -783,7 +767,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         self::assertCount(0, $backendUserOauth2ProviderConfigurations, 'assert: no oauth2 provider configuration exists for backend users');
     }
 
-    public function assertThatAFrontendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendIfUserLoginIsExpiredBeforeVerifyActionDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsUnableToActivateAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendIfUserLoginIsExpiredBeforeVerifyActionDataProvider(): \Generator
     {
         yield 'session is expired' => [
             'expiredByCookie' => false,
@@ -885,13 +869,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -990,13 +968,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();

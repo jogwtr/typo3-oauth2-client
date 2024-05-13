@@ -1,5 +1,5 @@
 {
-    "name": "waldhacker/typo3-oauth2-client",
+    "name": "co-stack/typo3-oauth2-client",
     "description": "TYPO3 OAuth2 Login Client (backend and frontend)",
     "license": [
         "GPL-2.0-or-later"
@@ -7,13 +7,19 @@
     "type": "typo3-cms-extension",
     "authors": [
         {
+            "name": "Oliver Eglseder",
+            "email": "oliver.eglseder@co-stack.com",
+            "homepage": "https://www.co-stack.com/",
+            "role": "Developer"
+        },
+        {
             "name": "waldhacker",
             "email": "hello@waldhacker.dev",
             "homepage": "https://waldhacker.dev",
             "role": "Developer"
         }
     ],
-    "homepage": "https://github.com/waldhacker/ext-oauth2-client",
+    "homepage": "https://gitlab.com/co-stack.com/co-stack.com/typo3-extensions/typo3-oauth2-client",
     "support": {
         "issues": "https://github.com/waldhacker/ext-oauth2-client/issues"
     },

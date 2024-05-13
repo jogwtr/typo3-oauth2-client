@@ -17,6 +17,7 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\SiteHandling;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Configuration\SiteConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\Internal\AbstractInstruction;
@@ -69,6 +70,7 @@ trait SiteBasedTestTrait
         }
         $siteConfiguration = new SiteConfiguration(
             $this->instancePath . '/typo3conf/sites/',
+            $this->getContainer()->get(EventDispatcherInterface::class),
             $this->getContainer()->get('cache.core')
         );
 
@@ -91,6 +93,7 @@ trait SiteBasedTestTrait
     ): void {
         $siteConfiguration = new SiteConfiguration(
             $this->instancePath . '/typo3conf/sites/',
+            $this->getContainer()->get(EventDispatcherInterface::class),
             $this->getContainer()->get('cache.core')
         );
         $configuration = $siteConfiguration->load($identifier);

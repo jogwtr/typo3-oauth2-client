@@ -19,13 +19,14 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Tests\Functional\Frontend;
 
 use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use Waldhacker\Oauth2Client\Tests\Functional\Fixtures\InvalidAccessTokenResponseFromGitLabHttpMock;
 use Waldhacker\Oauth2Client\Tests\Functional\Fixtures\SuccessfulGetUserFromGitLabHttpMock;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\FunctionalTestCase;
 
 class FrontendLoginTest extends FunctionalTestCase
 {
-    public function assertThatAFrontendUserIsAbleToLoginWithAOAuth2ProviderWhichConfiguredToBeUsedWithinTheFrontendAndActivatedByTheUserDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsAbleToLoginWithAOAuth2ProviderWhichConfiguredToBeUsedWithinTheFrontendAndActivatedByTheUserDataProvider(): \Generator
     {
         yield 'site1 EN with gitlab3-both' => [
             'oauth2LoginUriId' => 'oauth2test-login-gitlab3-both',
@@ -168,13 +169,7 @@ class FrontendLoginTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -205,7 +200,7 @@ class FrontendLoginTest extends FunctionalTestCase
         self::assertStringContainsString('type="submit" value="Logout"', $responseData['pageMarkup'], 'assert: we are logged in');
     }
 
-    public function assertThatAFrontendUserIsUnableToLoginWithAOAuth2ProviderWhichIsNotConfiguredToBeUsedWithinTheFrontendOrSiteButActivatedByTheUserDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsUnableToLoginWithAOAuth2ProviderWhichIsNotConfiguredToBeUsedWithinTheFrontendOrSiteButActivatedByTheUserDataProvider(): \Generator
     {
         yield 'site1 EN - login with a backend provider (gitlab2-be)' => [
             'oauth2LoginUriId' => 'oauth2test-login-gitlab2-be',
@@ -525,13 +520,7 @@ class FrontendLoginTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -645,13 +634,7 @@ class FrontendLoginTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -765,13 +748,7 @@ class FrontendLoginTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -802,7 +779,7 @@ class FrontendLoginTest extends FunctionalTestCase
         self::assertStringNotContainsString('type="submit" value="Logout"', $responseData['pageMarkup'], 'assert: we are not logged in');
     }
 
-    public function assertThatAFrontendUserIsUnableToLoginWithAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendButNotActivatedByTheUserDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsUnableToLoginWithAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendButNotActivatedByTheUserDataProvider(): \Generator
     {
         yield 'site1 EN with gitlab3-both' => [
             'oauth2LoginUriId' => 'oauth2test-login-gitlab3-both',
@@ -944,13 +921,7 @@ class FrontendLoginTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -981,7 +952,7 @@ class FrontendLoginTest extends FunctionalTestCase
         self::assertStringNotContainsString('type="submit" value="Logout"', $responseData['pageMarkup'], 'assert: we are not logged in');
     }
 
-    public function assertThatAFrontendUserIsUnableToLoginWithAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendIfInvalidaDataIsSumbittedDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsUnableToLoginWithAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendIfInvalidaDataIsSumbittedDataProvider(): \Generator
     {
         yield 'all empty' => [
             'remoteRequestData' => [
@@ -1134,12 +1105,7 @@ class FrontendLoginTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                'className' => $remoteRequestData['oauth2-code'] === '_invalid' ? InvalidAccessTokenResponseFromGitLabHttpMock::class : SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteRequestData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();
@@ -1179,7 +1145,7 @@ class FrontendLoginTest extends FunctionalTestCase
         self::assertStringNotContainsString('type="submit" value="Logout"', $responseData['pageMarkup'], 'assert: we are not logged in');
     }
 
-    public function assertThatAFrontendUserIsUnableToLoginWithAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendOrSiteAndActivatedButTheTYPO3UserIsInactiveOrWithinANotAllowedStorageDataProvider(): \Generator
+    public static function assertThatAFrontendUserIsUnableToLoginWithAOAuth2ProviderWhichIsConfiguredToBeUsedWithinTheFrontendOrSiteAndActivatedButTheTYPO3UserIsInactiveOrWithinANotAllowedStorageDataProvider(): \Generator
     {
         yield 'inactive user' => [
             'userUid' => 1005,
@@ -1281,13 +1247,7 @@ class FrontendLoginTest extends FunctionalTestCase
         $responseData = $this->fetchFrontendPageContens(
             $this->buildGetRequest($respondedCallbackUri, $responseData['cookieData']),
             false,
-            $this->buildRequestContext(['X_TYPO3_TESTING_FRAMEWORK' => ['HTTP' => ['mocks' => [
-                // successful Oauth2Service::getUser() request
-                'className' => SuccessfulGetUserFromGitLabHttpMock::class,
-                'options' => [
-                    'remoteUser' => $remoteUserData,
-                ],
-            ]]]])
+            (new InternalRequestContext())
         );
 
         $oauth2BackendSessionData = $this->getOauth2BackendSessionData();

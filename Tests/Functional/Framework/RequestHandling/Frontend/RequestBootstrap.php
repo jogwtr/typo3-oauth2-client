@@ -18,11 +18,14 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\Frontend;
 
-use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\AbstractRequestBootstrap;
+
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\ExtendedInternalRequest;
+
+use function json_decode;
 
 class RequestBootstrap extends AbstractRequestBootstrap
 {
@@ -47,10 +50,19 @@ class RequestBootstrap extends AbstractRequestBootstrap
             die('No request object given');
         }
 
-        $this->context = InternalRequestContext::fromArray(json_decode($this->requestArguments['context'], true));
-        $this->request = ExtendedInternalRequest::fromArray(json_decode($this->requestArguments['request'], true));
-
-        $requestUrlParts = parse_url((string)$this->request->getUri());
+        $context = json_decode($this->requestArguments['context'], true);
+        if (!empty($context)) {
+            $a = 'B';
+        } else {
+            $this->context = new InternalRequestContext();
+        }
+        $request = json_decode($this->requestArguments['request'], true);
+        if (!empty($request)) {
+            $a = 'B';
+        } else {
+            $this->request = new ExtendedInternalRequest();
+        }
+        $requestUrlParts = parse_url((string) $this->request->getUri());
 
         // Populating $_GET and $_REQUEST is query part is set:
         if (isset($requestUrlParts['query'])) {
@@ -69,11 +81,11 @@ class RequestBootstrap extends AbstractRequestBootstrap
         ];
         $_SERVER['DOCUMENT_ROOT'] = $this->documentRoot;
         $_SERVER['HTTP_USER_AGENT'] = 'TYPO3 Functional Test Request';
-        $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = isset($requestUrlParts['host']) ? $requestUrlParts['host'] : 'localhost';
+        $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = $requestUrlParts['host'] ?? 'localhost';
         $_SERVER['SERVER_ADDR'] = $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $_SERVER['SCRIPT_NAME'] = $_SERVER['PHP_SELF'] = $_SERVER['DOCUMENT_URI'] = '/index.php';
         $_SERVER['SCRIPT_FILENAME'] = $_SERVER['_'] = $_SERVER['PATH_TRANSLATED'] = $this->documentRoot . '/index.php';
-        $_SERVER['QUERY_STRING'] = (isset($requestUrlParts['query']) ? $requestUrlParts['query'] : '');
+        $_SERVER['QUERY_STRING'] = ($requestUrlParts['query'] ?? '');
         $_SERVER['REQUEST_URI'] = $requestUrlParts['path'] . (isset($requestUrlParts['query']) ? '?' . $requestUrlParts['query'] : '');
         $_SERVER['REQUEST_METHOD'] = $this->request->getMethod();
 

@@ -20,7 +20,7 @@ namespace Waldhacker\Oauth2Client\Tests\Functional\Framework;
 
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\Scenario\DataHandlerFactory;
 use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\Scenario\DataHandlerWriter;
 use Waldhacker\Oauth2Client\Backend\DataHandling\DataHandlerHook;
@@ -35,6 +35,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
 {
     use SiteBasedTestTrait;
     use Typo3RequestAwareTestTrait;
+
+    protected array $configurationToUseInTestInstance = self::DEFAULT_TYPO3_CONF_VARS;
 
     public const DEFAULT_TYPO3_CONF_VARS = [
         'BE' => [
@@ -58,11 +60,11 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     protected const SITE2_HOST = 'site2';
     protected const SITE2_BASE_URI = 'http://' . self::SITE2_HOST;
 
-    protected $pathsToLinkInTestInstance = [
+    protected array $pathsToLinkInTestInstance = [
         'typo3conf/ext/oauth2_client/Tests/Functional/Fixtures/Frontend/AdditionalConfiguration.php' => 'typo3conf/AdditionalConfiguration.php',
     ];
 
-    protected $coreExtensionsToLoad = [
+    protected array $coreExtensionsToLoad = [
         'core',
         'backend',
         'frontend',
@@ -75,10 +77,9 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         'setup',
     ];
 
-    protected $testExtensionsToLoad = [
-        'typo3conf/ext/oauth2_client',
-        'typo3conf/ext/oauth2_client_test',
-        'typo3conf/ext/json_response',
+    protected array $testExtensionsToLoad = [
+        'oauth2_client',
+        'oauth2_client_test'
     ];
 
     protected $frameworkExtensionsToLoad = [];
@@ -86,18 +87,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     protected $rootPageUid = 1;
 
     protected $databaseScenarioFile = __DIR__ . '/../Fixtures/Frontend/StandardPagesScenario.yaml';
-
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-        static::initializeDatabaseSnapshot();
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        static::destroyDatabaseSnapshot();
-        parent::tearDownAfterClass();
-    }
 
     protected function setUp(): void
     {
@@ -124,9 +113,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                     ]
                 )
             ],
-            [
-                $this->buildErrorHandlingConfiguration('Fluid', [404])
-            ]
+            $this->buildErrorHandlingConfiguration('Fluid', [404])
         );
 
         $this->writeSiteConfiguration(
@@ -150,9 +137,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                     ]
                 )
             ],
-            [
-                $this->buildErrorHandlingConfiguration('Fluid', [404])
-            ]
+            $this->buildErrorHandlingConfiguration('Fluid', [404])
+
         );
 
         $this->withDatabaseSnapshot(function () {
@@ -168,7 +154,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
 
     protected function setUpDatabase(): void
     {
-        $backendUser = $this->setUpBackendUserFromFixture(1);
+        $this->importCSVDataSet(GeneralUtility::getFileAbsFileName('EXT:oauth2_client/Tests/Functional/Fixtures/Backend/be_users.csv'));
+        $backendUser = $this->setUpBackendUser(1);
         Bootstrap::initializeLanguageObject();
 
         unset(
@@ -274,7 +261,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             ->setValue('pid', 0)
             ->setValue('crdate', $now->format('U'))
             ->setValue('tstamp', $now->format('U'))
-            ->setValue('cruser_id', $userId)
             ->setValue('parentid', $userId)
             ->setValue('provider', $providerId)
             ->setValue('identifier', $remoteIdentifier)
@@ -290,7 +276,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             ->setValue('pid', 0)
             ->setValue('crdate', $now->format('U'))
             ->setValue('tstamp', $now->format('U'))
-            ->setValue('cruser_id', $userId)
             ->setValue('parentid', $userId)
             ->setValue('provider', $providerId)
             ->setValue('identifier', $remoteIdentifier)
