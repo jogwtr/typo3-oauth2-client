@@ -28,6 +28,8 @@ use TYPO3\CMS\Core\Http\Stream;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use TYPO3\TestingFramework\Core\Testbase;
 
+use function serialize;
+
 trait Typo3RequestAwareTestTrait
 {
     public function fetchFrontendPageContens(
@@ -134,8 +136,8 @@ trait Typo3RequestAwareTestTrait
         bool $isBackendRequest = false,
     ): array {
         $arguments = [
-            'request' => json_encode($request),
-            'context' => json_encode($requestContext),
+            'request' => serialize($request),
+            'context' => serialize($requestContext),
         ];
 
         $templateFile = $isBackendRequest

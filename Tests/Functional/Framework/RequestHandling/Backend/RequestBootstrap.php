@@ -24,7 +24,7 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestCon
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\AbstractRequestBootstrap;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\ExtendedInternalRequest;
 
-use function json_decode;
+use function unserialize;
 
 class RequestBootstrap extends AbstractRequestBootstrap
 {
@@ -49,15 +49,15 @@ class RequestBootstrap extends AbstractRequestBootstrap
             die('No request object given');
         }
 
-        $context = json_decode($this->requestArguments['context'], true);
-        if (!empty($context)) {
-            $a = 'B';
+        $context = unserialize($this->requestArguments['context']);
+        if ($context instanceof InternalRequestContext) {
+            $this->context = $context;
         } else {
             $this->context = new InternalRequestContext();
         }
-        $request = json_decode($this->requestArguments['request'], true);
-        if (!empty($request)) {
-            $a = 'B';
+        $request = unserialize($this->requestArguments['request']);
+        if ($request instanceof ExtendedInternalRequest) {
+            $this->request = $request;
         } else {
             $this->request = new ExtendedInternalRequest();
         }

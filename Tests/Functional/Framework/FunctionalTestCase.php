@@ -31,6 +31,10 @@ use Waldhacker\Oauth2Client\Tests\Functional\Framework\FormHandling\DataPusher;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\Typo3RequestAwareTestTrait;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\SiteHandling\SiteBasedTestTrait;
 
+use function str_starts_with;
+
+use const LIBXML_NOWARNING;
+
 abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
 {
     use SiteBasedTestTrait;
@@ -328,7 +332,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     protected function goToOauth2ProvidersTestBackendModule(array $responseData): array
     {
         // Goto user setup module
-        $userSetupModuleUri = $this->extractLinkHrefFromResponseData('user_setup', $responseData);
+        $userSetupModuleUri = $this->extractLinkHrefFromResponseData('//*[@data-moduleroute-identifier="user_setup"]', $responseData);
 
         $responseData = $this->fetchBackendPageContens($this->buildGetRequest($userSetupModuleUri, $responseData['cookieData']));
         $cookies = $responseData['cookieData'];
@@ -338,16 +342,25 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         return $this->fetchBackendPageContens($this->buildGetRequest($uri, $responseData['cookieData']));
     }
 
-    protected function extractLinkHrefFromResponseData(string $elementId, array $responseData): string
+    protected function extractLinkHrefFromResponseData(string $elementIdOrXpath, array $responseData): string
     {
-        return $this->extractAttributeValueFromResponseData($elementId, 'href', $responseData);
+        return $this->extractAttributeValueFromResponseData($elementIdOrXpath, 'href', $responseData);
     }
 
-    protected function extractAttributeValueFromResponseData(string $elementId, string $attributeName, array $responseData): string
+    protected function extractAttributeValueFromResponseData(string $elementIdOrXpath, string $attributeName, array $responseData): string
     {
         $document = new \DOMDocument();
-        $document->loadHTML($responseData['pageMarkup']);
-        $element = $document->getElementById($elementId);
+        libxml_use_internal_errors(true); // TYPO3 uses HTML5 tags like "header", but they are not yet supported by libxml
+        $document->loadHTML($responseData['pageMarkup'], LIBXML_NOERROR | LIBXML_NOWARNING);
+        libxml_use_internal_errors(false);
+        if (str_starts_with($elementIdOrXpath, '//')) {
+            $xpath = new \DomXPath($document);
+            $fragment = new \DOMDocument();
+            foreach ($xpath->query($elementIdOrXpath) as $node) {
+                $fragment->appendChild($fragment->importNode($node, true));
+            }
+        }
+        $element = $document->getElementById($elementIdOrXpath);
         return $element->getAttribute($attributeName);
     }
 
