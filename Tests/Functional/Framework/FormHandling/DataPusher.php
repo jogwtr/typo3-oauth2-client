@@ -21,6 +21,7 @@ namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\FormHandling;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\ExtendedInternalRequest;
 
 use function str_ends_with;
@@ -69,7 +70,7 @@ class DataPusher
         return $this;
     }
 
-    public function toPostRequest(ExtendedInternalRequest $request, bool $withFormUri = true): ExtendedInternalRequest
+    public function toPostRequest(InternalRequest $request, bool $withFormUri = true): InternalRequest
     {
         if ($withFormUri) {
             $request = $request->withUri(new Uri($this->formData['actionUrl']));

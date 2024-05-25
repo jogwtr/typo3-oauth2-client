@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Tests\Functional\Framework;
 
+use Exception;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -41,7 +42,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     use Typo3RequestAwareTestTrait;
 
     protected array $configurationToUseInTestInstance = self::DEFAULT_TYPO3_CONF_VARS;
-
     public const DEFAULT_TYPO3_CONF_VARS = [
         'BE' => [
             'lockSSL' => false,
@@ -53,21 +53,31 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             ],
         ],
     ];
-
     protected const LANGUAGE_PRESETS = [
-        'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_GB.UTF8', 'iso' => 'en', 'hrefLang' => 'en-GB', 'direction' => ''],
-        'DE' => ['id' => 1, 'title' => 'Deutsch', 'locale' => 'de_DE.UTF8', 'iso' => 'de', 'hrefLang' => 'de-DE', 'direction' => ''],
+        'EN' => [
+            'id' => 0,
+            'title' => 'English',
+            'locale' => 'en_GB.UTF8',
+            'iso' => 'en',
+            'hrefLang' => 'en-GB',
+            'direction' => '',
+        ],
+        'DE' => [
+            'id' => 1,
+            'title' => 'Deutsch',
+            'locale' => 'de_DE.UTF8',
+            'iso' => 'de',
+            'hrefLang' => 'de-DE',
+            'direction' => '',
+        ],
     ];
-
     protected const SITE1_HOST = 'site1';
     protected const SITE1_BASE_URI = 'http://' . self::SITE1_HOST;
     protected const SITE2_HOST = 'site2';
     protected const SITE2_BASE_URI = 'http://' . self::SITE2_HOST;
-
     protected array $pathsToLinkInTestInstance = [
         'typo3conf/ext/oauth2_client/Tests/Functional/Fixtures/Frontend/AdditionalConfiguration.php' => 'typo3conf/AdditionalConfiguration.php',
     ];
-
     protected array $coreExtensionsToLoad = [
         'core',
         'backend',
@@ -80,16 +90,12 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         'fluid_styled_content',
         'setup',
     ];
-
     protected array $testExtensionsToLoad = [
         'oauth2_client',
-        'oauth2_client_test'
+        'oauth2_client_test',
     ];
-
     protected $frameworkExtensionsToLoad = [];
-
     protected $rootPageUid = 1;
-
     protected $databaseScenarioFile = __DIR__ . '/../Fixtures/Frontend/StandardPagesScenario.yaml';
 
     protected function setUp(): void
@@ -106,7 +112,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                         'enabled_oauth2_providers' => 'gitlab1-fe, gitlab3-both',
                         'oauth2_callback_slug' => '',
                         'oauth2_storage_pid' => 1000,
-                    ]
+                    ],
                 ),
                 array_replace_recursive(
                     $this->buildLanguageConfiguration('DE', '/de/'),
@@ -114,10 +120,10 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                         'enabled_oauth2_providers' => 'gitlab1-fe, gitlab4-fe, gitlab8-fe',
                         'oauth2_callback_slug' => '',
                         'oauth2_storage_pid' => 1000,
-                    ]
-                )
+                    ],
+                ),
             ],
-            $this->buildErrorHandlingConfiguration('Fluid', [404])
+            $this->buildErrorHandlingConfiguration('Fluid', [404]),
         );
 
         $this->writeSiteConfiguration(
@@ -130,7 +136,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                         'enabled_oauth2_providers' => 'gitlab4-fe, gitlab6-both',
                         'oauth2_callback_slug' => '',
                         'oauth2_storage_pid' => 1000,
-                    ]
+                    ],
                 ),
                 array_replace_recursive(
                     $this->buildLanguageConfiguration('DE', '/de/'),
@@ -138,10 +144,10 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                         'enabled_oauth2_providers' => 'gitlab1-fe, gitlab7-fe',
                         'oauth2_callback_slug' => '',
                         'oauth2_storage_pid' => 1000,
-                    ]
-                )
+                    ],
+                ),
             ],
-            $this->buildErrorHandlingConfiguration('Fluid', [404])
+            $this->buildErrorHandlingConfiguration('Fluid', [404]),
 
         );
 
@@ -158,7 +164,9 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
 
     protected function setUpDatabase(): void
     {
-        $this->importCSVDataSet(GeneralUtility::getFileAbsFileName('EXT:oauth2_client/Tests/Functional/Fixtures/Backend/be_users.csv'));
+        $this->importCSVDataSet(
+            GeneralUtility::getFileAbsFileName('EXT:oauth2_client/Tests/Functional/Fixtures/Backend/be_users.csv'),
+        );
         $backendUser = $this->setUpBackendUser(1);
         Bootstrap::initializeLanguageObject();
 
@@ -167,14 +175,14 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass'][1625556930],
             $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['checkModifyAccessList'][1625556930],
             $GLOBALS['TYPO3_CONF_VARS']['DB']['additionalQueryRestrictions'][Oauth2BeUserProviderConfigurationRestriction::class],
-            $GLOBALS['TYPO3_CONF_VARS']['DB']['additionalQueryRestrictions'][Oauth2FeUserProviderConfigurationRestriction::class]
+            $GLOBALS['TYPO3_CONF_VARS']['DB']['additionalQueryRestrictions'][Oauth2FeUserProviderConfigurationRestriction::class],
         );
 
         $factory = DataHandlerFactory::fromYamlFile($this->databaseScenarioFile);
         $writer = DataHandlerWriter::withBackendUser($backendUser);
         $writer->invokeFactory($factory);
         static::failIfArrayIsNotEmpty(
-            $writer->getErrors()
+            $writer->getErrors(),
         );
 
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][1625556930] = DataHandlerHook::class;
@@ -214,50 +222,94 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
 
     protected function getBackendSessionDataByUser(int $userId): array
     {
-        return array_values(array_filter($this->getBackendSessionData(), fn (array $session): bool => (int)$session['ses_userid'] === $userId));
+        return array_values(
+            array_filter(
+                $this->getBackendSessionData(),
+                fn(array $session): bool => (int) $session['ses_userid'] === $userId,
+            ),
+        );
     }
 
     protected function getFrontendSessionDataByUser(int $userId): array
     {
-        return array_values(array_filter($this->getFrontendSessionData(), fn (array $session): bool => (int)$session['ses_userid'] === $userId));
+        return array_values(
+            array_filter(
+                $this->getFrontendSessionData(),
+                fn(array $session): bool => (int) $session['ses_userid'] === $userId,
+            ),
+        );
     }
 
     protected function getOauth2BackendSessionData(): array
     {
-        return array_values(array_filter($this->getBackendSessionData(), fn (array $session): bool => strpos($session['ses_data_original'], 'oauth2') !== false));
+        return array_values(
+            array_filter(
+                $this->getBackendSessionData(),
+                fn(array $session): bool => strpos($session['ses_data_original'], 'oauth2') !== false,
+            ),
+        );
     }
 
     protected function getOauth2FrontendSessionData(): array
     {
-        return array_values(array_filter($this->getFrontendSessionData(), fn (array $session): bool => strpos($session['ses_data_original'], 'oauth2') !== false));
+        return array_values(
+            array_filter(
+                $this->getFrontendSessionData(),
+                fn(array $session): bool => strpos($session['ses_data_original'], 'oauth2') !== false,
+            ),
+        );
     }
 
     protected function removeOauth2BackendSessionData(): void
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('be_sessions');
-        $qb->delete('be_sessions')->where($qb->expr()->in('ses_id', $qb->createNamedParameter(array_column($this->getOauth2BackendSessionData(), 'ses_id'), Connection::PARAM_STR_ARRAY)))->execute();
+        $qb->delete('be_sessions')->where(
+            $qb->expr()->in(
+                'ses_id',
+                $qb->createNamedParameter(
+                    array_column($this->getOauth2BackendSessionData(), 'ses_id'),
+                    Connection::PARAM_STR_ARRAY,
+                ),
+            ),
+        )->execute();
     }
 
     protected function removeOauth2FrontendSessionData(): void
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('fe_sessions');
-        $qb->delete('fe_sessions')->where($qb->expr()->in('ses_id', $qb->createNamedParameter(array_column($this->getOauth2FrontendSessionData(), 'ses_id'), Connection::PARAM_STR_ARRAY)))->execute();
+        $qb->delete('fe_sessions')->where(
+            $qb->expr()->in(
+                'ses_id',
+                $qb->createNamedParameter(
+                    array_column($this->getOauth2FrontendSessionData(), 'ses_id'),
+                    Connection::PARAM_STR_ARRAY,
+                ),
+            ),
+        )->execute();
     }
 
     protected function deleteFrontendUser(int $userId): void
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('fe_users');
-        $qb->update('fe_users')->set('deleted', 1)->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_INT)))->execute();
+        $qb->update('fe_users')->set('deleted', 1)->where(
+            $qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_INT)),
+        )->execute();
     }
 
     protected function deleteBackendUser(int $userId): void
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('be_users');
-        $qb->update('be_users')->set('deleted', 1)->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_INT)))->execute();
+        $qb->update('be_users')->set('deleted', 1)->where(
+            $qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_INT)),
+        )->execute();
     }
 
-    protected function createBackendUserOauth2ProviderConfiguration(int $uid, int $userId, string $providerId, string $remoteIdentifier): void
-    {
+    protected function createBackendUserOauth2ProviderConfiguration(
+        int $uid,
+        int $userId,
+        string $providerId,
+        string $remoteIdentifier,
+    ): void {
         $now = new \DateTime();
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('tx_oauth2_beuser_provider_configuration');
         $qb->insert('tx_oauth2_beuser_provider_configuration')
@@ -271,8 +323,12 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             ->execute();
     }
 
-    protected function createFrontendUserOauth2ProviderConfiguration(int $uid, int $userId, string $providerId, string $remoteIdentifier): void
-    {
+    protected function createFrontendUserOauth2ProviderConfiguration(
+        int $uid,
+        int $userId,
+        string $providerId,
+        string $remoteIdentifier,
+    ): void {
         $now = new \DateTime();
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('tx_oauth2_feuser_provider_configuration');
         $qb->insert('tx_oauth2_feuser_provider_configuration')
@@ -294,12 +350,20 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
 
     protected function resetOauth2ProviderConfigurations(): void
     {
-        $this->getConnectionPool()->getConnectionForTable('tx_oauth2_beuser_provider_configuration')->truncate('tx_oauth2_beuser_provider_configuration');
-        $this->getConnectionPool()->getConnectionForTable('tx_oauth2_feuser_provider_configuration')->truncate('tx_oauth2_feuser_provider_configuration');
+        $this->getConnectionPool()->getConnectionForTable('tx_oauth2_beuser_provider_configuration')->truncate(
+            'tx_oauth2_beuser_provider_configuration',
+        );
+        $this->getConnectionPool()->getConnectionForTable('tx_oauth2_feuser_provider_configuration')->truncate(
+            'tx_oauth2_feuser_provider_configuration',
+        );
     }
 
-    protected function loginIntoFrontendWithUsernameAndPassword(string $siteBaseUri, string $languageSlug, string $username, string $password): array
-    {
+    protected function loginIntoFrontendWithUsernameAndPassword(
+        string $siteBaseUri,
+        string $languageSlug,
+        string $username,
+        string $password,
+    ): array {
         $uri = $siteBaseUri . $languageSlug . '/login';
         $responseData = $this->fetchFrontendPageContens($this->buildGetRequest($uri));
         $loginFormData = (new DataPusher(new DataExtractor($responseData['pageMarkup'])))
@@ -309,14 +373,20 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         return $this->fetchFrontendPageContens($loginFormData->toPostRequest($this->buildGetRequest()));
     }
 
-    protected function goToOauth2ProvidersTestFrontendPage(string $siteBaseUri, string $languageSlug, array $responseData): array
-    {
+    protected function goToOauth2ProvidersTestFrontendPage(
+        string $siteBaseUri,
+        string $languageSlug,
+        array $responseData,
+    ): array {
         $uri = $siteBaseUri . $languageSlug . '/manage-providers-test';
         return $this->fetchFrontendPageContens($this->buildGetRequest($uri, $responseData['cookieData']));
     }
 
-    protected function loginIntoBackendWithUsernameAndPassword(string $siteBaseUri, string $username, string $password): array
-    {
+    protected function loginIntoBackendWithUsernameAndPassword(
+        string $siteBaseUri,
+        string $username,
+        string $password,
+    ): array {
         $uri = $siteBaseUri . '/typo3/login?loginProvider=1433416747';
 
         $responseData = $this->fetchBackendPageContens($this->buildGetRequest($uri));
@@ -332,9 +402,14 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     protected function goToOauth2ProvidersTestBackendModule(array $responseData): array
     {
         // Goto user setup module
-        $userSetupModuleUri = $this->extractLinkHrefFromResponseData('//*[@data-moduleroute-identifier="user_setup"]', $responseData);
+        $userSetupModuleUri = $this->extractLinkHrefFromResponseData(
+            '//*[@data-moduleroute-identifier="user_setup"]',
+            $responseData,
+        );
 
-        $responseData = $this->fetchBackendPageContens($this->buildGetRequest($userSetupModuleUri, $responseData['cookieData']));
+        $responseData = $this->fetchBackendPageContens(
+            $this->buildGetRequest($userSetupModuleUri, $responseData['cookieData']),
+        );
         $cookies = $responseData['cookieData'];
 
         // Goto manage oauth2 providers test module
@@ -347,18 +422,29 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         return $this->extractAttributeValueFromResponseData($elementIdOrXpath, 'href', $responseData);
     }
 
-    protected function extractAttributeValueFromResponseData(string $elementIdOrXpath, string $attributeName, array $responseData): string
-    {
+    protected function extractAttributeValueFromResponseData(
+        string $elementIdOrXpath,
+        string $attributeName,
+        array $responseData,
+    ): string {
         $document = new \DOMDocument();
-        libxml_use_internal_errors(true); // TYPO3 uses HTML5 tags like "header", but they are not yet supported by libxml
+        // TYPO3 uses HTML5 tags like "header", but they are not yet supported by libxml
+        libxml_use_internal_errors(true);
         $document->loadHTML($responseData['pageMarkup'], LIBXML_NOERROR | LIBXML_NOWARNING);
         libxml_use_internal_errors(false);
         if (str_starts_with($elementIdOrXpath, '//')) {
             $xpath = new \DomXPath($document);
-            $fragment = new \DOMDocument();
             foreach ($xpath->query($elementIdOrXpath) as $node) {
-                $fragment->appendChild($fragment->importNode($node, true));
+                if ($node->hasAttribute($attributeName)) {
+                    return $node->getAttribute($attributeName);
+                }
             }
+            if (!isset($node)) {
+                throw new Exception(sprintf('Could not find element: %s', $elementIdOrXpath));
+            }
+            throw new Exception(
+                sprintf('Not element found by %s has the attribute: %s', $elementIdOrXpath, $attributeName),
+            );
         }
         $element = $document->getElementById($elementIdOrXpath);
         return $element->getAttribute($attributeName);
@@ -372,7 +458,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                 $session['ses_data'] = unserialize($session['ses_data'] ?? '', ['allowed_classes' => false]);
                 return $session;
             },
-            $sessions
+            $sessions,
         );
     }
 }

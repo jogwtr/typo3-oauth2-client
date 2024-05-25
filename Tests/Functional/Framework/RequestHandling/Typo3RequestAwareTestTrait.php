@@ -18,22 +18,25 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling;
 
+use Exception;
 use GuzzleHttp\Cookie\SetCookie;
 use PHPUnit\Util\PHP\AbstractPhpProcess;
 use Psr\Http\Message\ResponseInterface;
 use SebastianBergmann\Template\Template;
-use TYPO3\CMS\Core\Http\Response;
-use TYPO3\CMS\Core\Http\ResponseFactory;
-use TYPO3\CMS\Core\Http\Stream;
+use TYPO3\CMS\Core\Http\StreamFactory;
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use TYPO3\TestingFramework\Core\Testbase;
 
 use function serialize;
+use function unserialize;
+
+use const PHP_EOL;
 
 trait Typo3RequestAwareTestTrait
 {
     public function fetchFrontendPageContens(
-        ExtendedInternalRequest $request,
+        InternalRequest $request,
         bool $followRedirects = true,
         InternalRequestContext $requestContext = null,
     ): array {
@@ -48,7 +51,7 @@ trait Typo3RequestAwareTestTrait
     }
 
     public function fetchBackendPageContens(
-        ExtendedInternalRequest $request,
+        InternalRequest $request,
         bool $followRedirects = true,
         InternalRequestContext $requestContext = null,
     ): array {
@@ -62,9 +65,9 @@ trait Typo3RequestAwareTestTrait
         ];
     }
 
-    public function buildGetRequest(?string $uri = null, array $cookieData = []): ExtendedInternalRequest
+    public function buildGetRequest(?string $uri = null, array $cookieData = []): InternalRequest
     {
-        return (new ExtendedInternalRequest($uri))->withCookieParams($cookieData);
+        return (new InternalRequest($uri))->withCookieParams($cookieData);
     }
 
     public function buildPostRequest(
@@ -72,7 +75,7 @@ trait Typo3RequestAwareTestTrait
         array $postData = [],
         array $queryParameters = [],
         array $cookieData = [],
-    ): ExtendedInternalRequest {
+    ): InternalRequest {
         return $this->buildGetRequest($uri, $cookieData)
             ->withMethod('POST')
             ->withParsedBody($postData)
@@ -80,7 +83,7 @@ trait Typo3RequestAwareTestTrait
     }
 
     private function executeRequest(
-        ExtendedInternalRequest $request,
+        InternalRequest $request,
         InternalRequestContext $requestContext = null,
         bool $isBackendRequest = false,
         bool $followRedirects = true,
@@ -108,8 +111,10 @@ trait Typo3RequestAwareTestTrait
             }
             $locationHeaders[] = $locationHeader;
 
-            $cookies = array_map(fn(string $cookie): SetCookie => SetCookie::fromString($cookie),
-                $response->getHeader('Set-Cookie'));
+            $cookies = array_map(
+                fn(string $cookie): SetCookie => SetCookie::fromString($cookie),
+                $response->getHeader('Set-Cookie'),
+            );
             $cookieData = array_filter(
                 array_replace_recursive(
                     $cookieData,
@@ -131,15 +136,10 @@ trait Typo3RequestAwareTestTrait
     }
 
     private function retrieveRequestResult(
-        ExtendedInternalRequest $request,
+        InternalRequest $request,
         InternalRequestContext $requestContext,
         bool $isBackendRequest = false,
     ): array {
-        $arguments = [
-            'request' => serialize($request),
-            'context' => serialize($requestContext),
-        ];
-
         $templateFile = $isBackendRequest
             ? __DIR__ . '/Backend/request.tpl'
             : __DIR__ . '/Frontend/request.tpl';
@@ -147,9 +147,9 @@ trait Typo3RequestAwareTestTrait
         $template = new Template($templateFile);
 
         $template->setVar([
-            'arguments' => var_export($arguments, true),
+            'request' => serialize($request),
+            'context' => serialize($requestContext),
             'documentRoot' => $this->instancePath,
-            'originalRoot' => ORIGINAL_ROOT,
             'vendorPath' => (new Testbase())->getPackagesPath(),
         ]);
 
@@ -160,40 +160,37 @@ trait Typo3RequestAwareTestTrait
     private function reconstituteRequestResult(array $result): ResponseInterface
     {
         if (!empty($result['stderr'])) {
-            $this->fail('Response is erroneous: ' . LF . $result['stderr']);
+            self::fail('Response is erroneous: ' . PHP_EOL . $result['stderr']);
         }
 
         $data = json_decode($result['stdout'] ?? '', true);
         if ($data === false) {
-            $this->fail('Response is empty: ' . LF . $result['stdout'] ?? '');
+            self::fail('Response is empty');
         }
 
-        if ($data['status'] === 'failure') {
-            try {
-                $exception = new $data['exception']['type'](
-                    $data['exception']['message'],
-                    $data['exception']['code'],
-                );
-            } catch (\Throwable $throwable) {
-                $exception = new \Exception(
-                    (string) $data['exception']['message'],
-                    (int) $data['exception']['code'],
-                    (string) $data['exception']['type'],
+        if (!empty($data['exception'])) {
+            if (!$data['exception'] instanceof \Throwable) {
+                throw new Exception(
+                    'Got content in key "exception" as response from the subrequest, but it is not an exception',
+                    1716628244,
                 );
             }
-            throw $exception;
+            throw $data['exception'];
         }
 
-        if (($data['content'] ?? null) === null) {
-            self::fail('Response is empty: ' . LF . $data);
+        if (!empty($data['unexpectedOutput'])) {
+            self::fail('Got unexpected output during sub request dispatching: ' . PHP_EOL . $data['unexpectedOutput']);
         }
 
-        $responseFactory = new ResponseFactory();
-        $response = $responseFactory->createResponse();
-        $response->getBody()->write($data['content']);
-        foreach ($data['headers'] as $name => $value) {
-            $response = $response->withHeader($name, $value);
+        if (empty($data['response'])) {
+            self::fail('Request was dispatched without error but response is empty');
         }
-        return $response;
+
+        $streamFactory = new StreamFactory();
+        $stream = $streamFactory->createStream($data['body']);
+
+        /** @var ResponseInterface $response */
+        $response = unserialize($data['response']);
+        return $response->withBody($stream);
     }
 }

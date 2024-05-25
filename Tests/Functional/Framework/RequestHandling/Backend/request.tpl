@@ -1,8 +1,11 @@
 <?php
-
-require '{documentRoot}/typo3/sysext/core/Classes/Core/SystemEnvironmentBuilder.php';
-require '{documentRoot}/typo3conf/ext/oauth2_client/Tests/Functional/Framework/RequestHandling/AbstractRequestBootstrap.php';
-require '{documentRoot}/typo3conf/ext/oauth2_client/Tests/Functional/Framework/RequestHandling/Backend/RequestBootstrap.php';
-(new \Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\Backend\RequestBootstrap('{documentRoot}', '{vendorPath}', {arguments}))->executeAndOutput();
-
-?>
+$classLoader = require_once '{vendorPath}/autoload.php';
+$context = unserialize('{context}');
+$request = unserialize('{request}');
+$requestBootstrap = new \Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\Backend\RequestBootstrap(
+    '{documentRoot}',
+    $classLoader,
+    $context,
+    $request
+);
+$requestBootstrap->executeAndOutput();

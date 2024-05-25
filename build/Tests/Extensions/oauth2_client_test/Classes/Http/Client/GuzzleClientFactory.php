@@ -20,7 +20,6 @@ namespace Waldhacker\Oauth2ClientTest\Http\Client;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Waldhacker\Oauth2ClientTest\Http\Client\Middleware\LogMiddleware;
@@ -30,22 +29,21 @@ class GuzzleClientFactory
     public static function getClient(): ClientInterface
     {
         $httpOptions = $GLOBALS['TYPO3_CONF_VARS']['HTTP'];
-        $httpOptions['verify'] = filter_var($httpOptions['verify'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $httpOptions['verify'];
+        $httpOptions['verify'] = filter_var(
+            $httpOptions['verify'],
+            FILTER_VALIDATE_BOOLEAN,
+            FILTER_NULL_ON_FAILURE,
+        ) ?? $httpOptions['verify'];
 
-        if (isset($GLOBALS['X_TYPO3_TESTING_FRAMEWORK']['HTTP']['mocks']['className'])) {
-            $mock = GeneralUtility::makeInstance(
-                $GLOBALS['X_TYPO3_TESTING_FRAMEWORK']['HTTP']['mocks']['className'],
-                $GLOBALS['X_TYPO3_TESTING_FRAMEWORK']['HTTP']['mocks']['options'] ?? []
-            );
-            $stack = MockHandler::createWithMiddleware($mock->getResponseQueue());
-        } else {
-            $stack = HandlerStack::create();
-        }
 
         $logMiddleware = GeneralUtility::makeInstance(LogMiddleware::class);
+        $stack = HandlerStack::create();
         $stack->unshift($logMiddleware, 'logger');
 
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler']) && is_array($GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler'])) {
+        if (
+            isset($GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler'])
+            && is_array($GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler'])
+        ) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler'] ?? [] as $handler) {
                 $stack->push($handler);
             }
