@@ -35,6 +35,6 @@ class ManageProvidersController
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
         $moduleTemplate = $this->moduleTemplateFactory->create($request);
-        return $moduleTemplate->renderResponse('ManageProviders');
+        return $moduleTemplate->renderResponse('Backend/ManageProviders');
     }
 }
