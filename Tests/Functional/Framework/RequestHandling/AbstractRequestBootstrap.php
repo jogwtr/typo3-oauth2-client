@@ -126,7 +126,7 @@ abstract class AbstractRequestBootstrap
             $result['response'] = serialize($response);
             $result['body'] = $body;
         } catch (Throwable $exception) {
-            $result['exception'] = serialize($exception);
+            $result['exception'] = $this->dumpException($exception);
         }
 
         $unexpectedOutput = ob_get_clean();
@@ -140,6 +140,22 @@ abstract class AbstractRequestBootstrap
         } catch (Throwable $exception) {
             $this->errorExit((string) $exception);
         }
+    }
+
+    protected function dumpException(?Throwable $exception): array
+    {
+        if (null === $exception) {
+            return [];
+        }
+        return [
+            'message' => $exception->getMessage(),
+            'code' => $exception->getCode(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            // Use traceAsString to circumvent the possible serialization of closures
+            'trace' => $exception->getTraceAsString(),
+            'previous' => $this->dumpException($exception->getPrevious()),
+        ];
     }
 
     protected function errorExit(string $message): never

@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling;
 
-use Exception;
 use GuzzleHttp\Cookie\SetCookie;
 use PHPUnit\Util\PHP\AbstractPhpProcess;
 use Psr\Http\Message\ResponseInterface;
@@ -30,6 +29,7 @@ use TYPO3\TestingFramework\Core\Testbase;
 
 use function serialize;
 use function unserialize;
+use function var_export;
 
 use const PHP_EOL;
 
@@ -169,13 +169,7 @@ trait Typo3RequestAwareTestTrait
         }
 
         if (!empty($data['exception'])) {
-            if (!$data['exception'] instanceof \Throwable) {
-                throw new Exception(
-                    'Got content in key "exception" as response from the subrequest, but it is not an exception',
-                    1716628244,
-                );
-            }
-            throw $data['exception'];
+            self::fail('Got an exception in the sub request: ' . PHP_EOL . var_export($data['exception'], true));
         }
 
         if (!empty($data['unexpectedOutput'])) {
