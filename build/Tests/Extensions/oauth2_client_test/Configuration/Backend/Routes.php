@@ -14,9 +14,13 @@
  * The TYPO3 project - inspiring people to share!
  */
 
+declare(strict_types=1);
+
+use Waldhacker\Oauth2ClientTest\Controller\Backend\ManageProvidersController;
+
 return [
     'oauth2_manage_providers_test' => [
         'path' => '/oauth2/manage/providers/test',
-        'target' => \Waldhacker\Oauth2ClientTest\Controller\Backend\ManageProvidersController::class,
+        'target' => ManageProvidersController::class,
     ]
 ];

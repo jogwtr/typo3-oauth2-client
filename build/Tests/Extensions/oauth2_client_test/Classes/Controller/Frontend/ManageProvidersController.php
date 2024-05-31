@@ -19,7 +19,6 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2ClientTest\Controller\Frontend;
 
 use Psr\Http\Message\ResponseInterface;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 class ManageProvidersController extends ActionController

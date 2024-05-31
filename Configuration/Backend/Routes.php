@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Waldhacker\Oauth2Client\Controller\Backend\ManageProvidersController;
 use Waldhacker\Oauth2Client\Controller\Backend\Registration\AuthorizeController;
 use Waldhacker\Oauth2Client\Controller\Backend\Registration\VerifyController;
