@@ -1,19 +1,9 @@
 <?php
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use Waldhacker\Oauth2Client\Backend\UserSettingsModule\ManageProvidersButtonRenderer;
+use CoStack\Oauth2Client\Backend\Form\RenderType\ConnectOauthProviderElement;
 
-defined('TYPO3') || die();
-
-(static function () {
-    $GLOBALS['TYPO3_USER_SETTINGS']['columns']['tx_oauth2_client_configs'] = [
-        'label' => 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:userSettings.label',
-        'type' => 'user',
-        'userFunc' => ManageProvidersButtonRenderer::class . '->render',
-    ];
-
-    ExtensionManagementUtility::addFieldsToUserSettings(
-        'tx_oauth2_client_configs',
-        'after:mfaProviders'
-    );
-})();
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1752700799] = [
+    'nodeName' => 'connectOauthProvider',
+    'priority' => '70',
+    'class' => ConnectOauthProviderElement::class,
+];

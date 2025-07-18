@@ -1,25 +1,58 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" date="2021-03-25T18:20:51Z" product-name="oauth2_client">
-        <header />
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" product-name="oauth2_client_nuevo">
+        <header/>
         <body>
-            <trans-unit id="manage_providers.title" resname="manage_providers.title">
-                <source>Social login manager</source>
+            <trans-unit id="backend">
+                <source>Login with OAuth 2.0</source>
             </trans-unit>
-            <trans-unit id="manage_providers.description" resname="manage_providers.description">
-                <source>Choose which of your favorite social platforms you want to log in with</source>
+            <trans-unit id="1751923182">
+                <source>34f5zd34z5</source>
             </trans-unit>
-            <trans-unit id="manage_providers.deactivateLinkLabel" resname="overview.deactivateLinkLabel">
-                <source>Deactivate</source>
+            <trans-unit id="login.process">
+                <source>Logging in with "%s"...</source>
             </trans-unit>
-            <trans-unit id="manage_providers.deactivateLinkTitle" resname="overview.deactivateLinkTitle">
-                <source>Deactivate %s</source>
+            <trans-unit id="login_user.process">
+                <source>Logging in as "%s"...</source>
             </trans-unit>
-            <trans-unit id="manage_providers.activateLinkTitle" resname="overview.activateLinkTitle">
-                <source>Activate %s</source>
+            <trans-unit id="login.oauth_client_fail">
+                <source>An error in the OAuth client occurred.</source>
             </trans-unit>
-            <trans-unit id="manage_providers.activateLinkLabel" resname="overview.activateLinkLabel">
-                <source>Activate</source>
+            <trans-unit id="login.authorization_code_error">
+                <source>Could not retrieve the access token from the authorization server. Request: %s, Error code: %d</source>
+            </trans-unit>
+            <trans-unit id="login.resource_owner_error">
+                <source>Could not receive the resource owner from the resource server. Request: %s, Error code: %d</source>
+            </trans-unit>
+            <trans-unit id="login.no_backend_user_found">
+                <source>No backend user is connected to your online account.</source>
+            </trans-unit>
+            <trans-unit id="tca.be_users.columns.tx_oauth2client_oauth_configs.label">
+                <source>OAuth client configs</source>
+            </trans-unit>
+            <trans-unit id="labels.oauth2.enabled">
+                <source>OAuth2 enabled</source>
+            </trans-unit>
+            <trans-unit id="labels.oauth2.disabled">
+                <source>No OAuth2 configured</source>
+            </trans-unit>
+            <trans-unit id="buttons.deactivateProvider">
+                <source>No OAuth2 configured</source>
+            </trans-unit>
+            <trans-unit id="buttons.deactivateProvider.confirmation.text">
+                <source>Are you sure you want to remove %s? This action can not be undone and will be applied immediately!</source>
+            </trans-unit>
+            <trans-unit id="buttons.deactivateProvider">
+                <source>Remove %s?</source>
+            </trans-unit>
+            <trans-unit id="provider.gitlab">
+                <source>Gitlab</source>
+            </trans-unit>
+            <trans-unit id="provider.github">
+                <source>Github</source>
+            </trans-unit>
+            <trans-unit id="provider.keycloak">
+                <source>Keycloak</source>
             </trans-unit>
         </body>
     </file>

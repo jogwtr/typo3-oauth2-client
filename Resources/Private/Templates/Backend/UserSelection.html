@@ -1,0 +1,31 @@
+<html
+        xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+        data-namespace-typo3-fluid="true"
+>
+
+    <f:layout name="Backend/Login" />
+
+    <f:section name="loginFormFields">
+        <p>Select the user you want to login with</p>
+        <f:for each="{options}" as="option">
+            <div class="form-group d-grid mb-2">
+                <button
+                        class="btn btn-login d-flex t3js-login-submit"
+                        style="justify-content: space-between"
+                        type="submit"
+                        name="selected_be_user"
+                        value="{option.value}"
+                        data-loading-text="{f:render(section: 'providerLogin', arguments: '{_all}') -> f:format.htmlspecialchars()}"
+                >
+                    <span style="flex: 1;">{option.label}</span>
+
+                </button>
+            </div>
+        </f:for>
+    </f:section>
+
+    <f:section name="providerLogin">
+        <span>{core:icon(identifier: 'spinner-circle', size: 'small') -> f:format.raw()}</span>
+        <span style="flex: 1;"><f:translate id="LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:login_user.process" arguments="{0: option.label}" /></span>
+    </f:section>
+</html>

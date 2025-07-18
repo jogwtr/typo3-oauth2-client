@@ -1,37 +1,74 @@
-# TYPO3 OAuth2 login client (backend and frontend)
+# co-stack/typo3-oauth2-client-nuevo
 
-Allow your frontend and backend users to add login possibilities via any OAuth2 provider. Popular examples are Github or Gitlab, Google, Facebook or LinkedIn or classically self-hosted solutions like Keycloak.
+A TYPO3 Frontend and Backend Login extension using OAuth 2.0.
 
-The extension allows administrators/integrators to configure various providers and offers any frontend and/or backend user an interface to add their OAuth2 based login.
+Features:
+* **Paranoid Security**
+* Connect your existing backend user with an oauth2 provider (e.g. Github, Gitlab, Keycloak, ...)
+* Connect an oauth2 provider with multiple backend users and select the backend user to log in.
 
-This extension is especially powerful in combination with the Multi-Factor Capabilities of TYPO3 as you can provide backend users with a single-sign-on login of their choice and add additional security of MFA
-to TYPO3.
+## Installation
 
-For more info, please refer to the documentation.
+```shell
+composer require co-stack/typo3-oauth2-client-nuevo
+```
 
-## Backend login
+## Usage
 
-![Image of Dashboards](Documentation/Images/Backend/loginScreen.png)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![Image of Dashboards](Documentation/Images/Backend/configuredProviders.png)
+Register an oauth provider (like gitlab) in `$GLOBALS` or with one of the provided utility methods:
 
-## Frontend login
+```php
+ProviderRegistrationUtility::registerGitlab(
+    'Public Gitlab',
+    ProviderScope::BE,
+    [
+        'clientId' => '[CLIENT_ID]',
+        'clientSecret' => '[CLIENT_SECRET]',
+    ],
+);
+```
 
-![Image of Dashboards](Documentation/Images/Frontend/loginScreen.png)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![Image of Dashboards](Documentation/Images/Frontend/configuredProviders.png)
+# Developer Information
 
-## Quick Install
+Requesting a login with OAuth requires you to lead the user to the oauth provider.
+This requires a return URL, where the user is redirected to after.
+That redirect URL points to our TYPO3 including an authorization_code.
+TYPO3 requires a valid request token, otherwise the login will fail.
+Most developers require to cookieSameSite lax, which will send the cookie with the redirect from the oauth provider.
+The cookies contain the request token.
+You can also redirect the user in TYPO3 using a meta http-refresh tag as a workaround.
 
-`composer req co-stack/typo3-oauth2-client`
+* Open TYPO3 Backend Login Screen
+* Click "Login with 'Oauth Provider'"
+* Redirected to oauth provider
+* Login with oauth provider
+* Redirected back to TYPO3
+* Redirected to TYPO3 again (if same site = strict)
+* Validate request token
+* Validate login
 
-## Issues & Contributions
+## Design choices
 
-Find the code at https://gitlab.com/co-stack.com/co-stack.com/typo3-extensions/typo3-oauth2-client
+* Register provider in `$GLOBALS`
+  * always accessible
+  * mutable
+  * no autoload required
+  * usable in settings.php, additional.php, and ext_localconf.php
+* Handle providers as `Provider`
+  * Multiton
+  * Immutable
 
-Report issues at https://gitlab.com/co-stack.com/co-stack.com/typo3-extensions/typo3-oauth2-client/-/issues
+## Terminology
+* (OAuth) Provider: A service like github, gitlab, google, ... that provides a OAuth 2.0 Application
 
-### Security
+# Licenses
 
-If you learn about a potential security issue, please **always** contact us via security@co-stack.com and please **do not** create a public visible issue.
-Please always include the version number where you've discovered the issue.
+List of used assets with source and license
 
-Alternatively you can contact the TYPO3 Security Team via security@typo3.org.
-Please always include the version number where you've discovered the issue.
-For more details see [TYPO3 Security Team](https://typo3.org/community/teams/security/).
+[LICENSE](LICENSE)
+* License: Copyright (C) 2007 Free Software Foundation
+* Source: https://www.gnu.org/licenses/gpl-3.0.txt
+
+[Resources/Public/Icons/Extension.svg](Resources/Public/Icons/Extension.svg)
+* License: CC BY-SA 3.0
+* Source: https://wiki.oauth.net/Logo

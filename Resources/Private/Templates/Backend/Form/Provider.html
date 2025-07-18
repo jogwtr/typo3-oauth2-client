@@ -1,0 +1,74 @@
+<html
+        xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+        xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+        xmlns:oauth="http://typo3.org/ns/CoStack/Oauth2Client/ViewHelpers"
+        data-namespace-typo3-fluid="true"
+>
+    <div class="formengine-field-item t3js-formengine-field-item" id="{fieldId}">
+        <div class="form-control-wrap" style="max-width:{maxInputWidth}px">
+            <div class="form-wizards-wrap">
+                <div class="form-wizards-element">
+                    <f:if condition="{providers}">
+                        <f:then>
+                        <span class="label label-danger label-space-right t3js-oauth2-status-label"
+                              data-alternative-label="{f:translate(id: 'LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:labels.oauth2.disabled')}">
+                            <f:translate
+                                    id="LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:labels.oauth2.enabled"/>
+                        </span>
+                            <ul class="list-group t3js-oauth2-active-providers-list">
+                                <f:for each="{providers}" key="hash" as="provider">
+                                    <f:variable name="translatedProviderLabel"
+                                                value="{f:translate(id: provider.label)}"/>
+                                    <li class="list-group-item" id="provider-{hash}" style="line-height: 2.1em;">
+                                        <core:icon identifier="{provider.iconIdentifier}"/>
+                                        {translatedProviderLabel}
+                                        <f:if condition="{activeProviders.{hash}}">
+                                            <f:then>
+                                                <f:variable name="dataTitle"><f:translate
+                                                        id="LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:buttons.deactivateProvider"
+                                                        arguments="{0: '{translatedProviderLabel}'}"/></f:variable>
+                                                <f:variable name="bsContent"><f:translate
+                                                        id="LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:buttons.deactivateProvider.confirmation.text"
+                                                        arguments="{0: '{translatedProviderLabel}'}"/></f:variable>
+                                                <f:variable name="buttonCloseText"><f:translate
+                                                        id="LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:labels.cancel"/></f:variable>
+                                                <f:variable name="buttonOkText"><f:translate
+                                                        id="LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:labels.deactivate"/></f:variable>
+                                                <oauth:link.deleteRecord uid="{activeProviders.{hash}.uid}"
+                                                                         table="tx_oauth2client_beuser_oauth_config"
+                                                                         class="btn btn-default btn-sm pull-right t3js-modal-trigger"
+                                                                         title="{dataTitle}"
+                                                                         data="{
+                                                                            title: dataTitle,
+                                                                            bs-content: bsContent,
+                                                                            button-close-text: buttonCloseText,
+                                                                            button-ok-text: buttonOkText,
+                                                                            severity: 'warning'
+                                                                         }"
+                                                >
+                                                    <core:icon identifier="actions-delete"/>
+                                                </oauth:link.deleteRecord>
+                                            </f:then>
+                                            <f:else>
+                                                <span class="btn btn-default btn-sm pull-right t3js-modal-trigger">
+                                                    <core:icon identifier="actions-plus"/>
+                                                </span>
+                                            </f:else>
+                                        </f:if>
+                                    </li>
+                                </f:for>
+                            </ul>
+                        </f:then>
+                        <f:else>
+                        <span class="label label-danger label-space-right t3js-oauth2-status-label"
+                              data-alternative-label="{f:translate(id: 'LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:labels.oauth2.enabled')}">
+                            <f:translate
+                                    id="LLL:EXT:oauth2_client_nuevo/Resources/Private/Language/locallang.xlf:labels.oauth2.disabled"/>
+                        </span>
+                        </f:else>
+                    </f:if>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>

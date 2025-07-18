@@ -1,41 +1,26 @@
 <?php
 
-use Waldhacker\Oauth2Client\Middleware\Backend\BeforeAuthenticationHandler as BackendBeforeAuthenticationHandler;
-use Waldhacker\Oauth2Client\Middleware\Frontend\AfterAuthenticationHandler;
-use Waldhacker\Oauth2Client\Middleware\Frontend\BeforeAuthenticationHandler as FrontendBeforeAuthenticationHandler;
+declare(strict_types=1);
+
+use CoStack\Oauth2Client\Middleware\ConvertPostLoginRedirectToHtmlRedirectMiddleware;
+use CoStack\Oauth2Client\Middleware\RegisterBackendUserSelectionLoginProviderMiddleware;
 
 return [
     'backend' => [
-        'oauth2-before-authentication' => [
-            'target' => BackendBeforeAuthenticationHandler::class,
+        'co-stack/oauth2_client_nuevo/conver' => [
+            'target' => ConvertPostLoginRedirectToHtmlRedirectMiddleware::class,
             'before' => [
-                'typo3/cms-backend/authentication',
+                'co-stack/oauth2_client_nuevo/process',
             ],
             'after' => [
                 'typo3/cms-backend/backend-routing',
             ],
         ],
-    ],
-    'frontend' => [
-        'oauth2-before-authentication' => [
-            'target' => FrontendBeforeAuthenticationHandler::class,
-            'before' => [
-                'typo3/cms-frontend/authentication',
-            ],
+        'co-stack/oauth2_client_nuevo/register_beuser_selection' => [
+            'target' => RegisterBackendUserSelectionLoginProviderMiddleware::class,
+            'before' => [],
             'after' => [
-                'typo3/cms-frontend/site',
-                'typo3/cms-frontend/maintenance-mode',
-            ],
-        ],
-        'oauth2-after-authentication' => [
-            'target' => AfterAuthenticationHandler::class,
-            'before' => [
-                'typo3/cms-frontend/base-redirect-resolver',
-                'typo3/cms-redirects/redirecthandler',
-                'typo3/cms-adminpanel/initiator',
-            ],
-            'after' => [
-                'typo3/cms-frontend/authentication',
+                'typo3/cms-core/response-propagation',
             ],
         ],
     ],
