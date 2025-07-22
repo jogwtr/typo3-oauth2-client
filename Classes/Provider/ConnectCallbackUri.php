@@ -12,12 +12,17 @@ readonly class ConnectCallbackUri implements CallbackUri
 {
     public function __construct(
         public LockedSecurityObjects $securityObjects,
+        protected UriBuilder $uriBuilder,
     ) {}
 
-    public function build(UriBuilder $uriBuilder): Uri
+    public function build(): Uri
     {
         $params = $this->securityObjects->addSecurityObjectsToParams();
 
-        return $uriBuilder->buildUriFromRoute('oauth2client_connect_authorize', $params, UriBuilder::ABSOLUTE_URL);
+        return $this->uriBuilder->buildUriFromRoute(
+            'oauth2client_connect_authorize',
+            $params,
+            UriBuilder::ABSOLUTE_URL,
+        );
     }
 }

@@ -7,9 +7,9 @@ namespace CoStack\Oauth2Client\Provider;
 use CoStack\EasyRequestToken\Security\LockedSecurityObjects;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use SensitiveParameter;
-use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 use function hash;
 
 readonly class Provider
@@ -29,34 +29,28 @@ readonly class Provider
         return hash('sha256', $this->identifier);
     }
 
-    public function getAuthorizationUrl(
-        CallbackUri $callbackUri,
-        UriBuilder $uriBuilder,
-        LockedSecurityObjects $securityObjects,
-    ): Uri {
-        $provider = $this->getOauthProvider($callbackUri, $uriBuilder);
+    public function getAuthorizationUrl(CallbackUri $callbackUri, LockedSecurityObjects $securityObjects): Uri
+    {
+        $provider = $this->getOauthProvider($callbackUri);
 
         $uri = $provider->getAuthorizationUrl(['state' => $securityObjects->getSigningIdentifierName()]);
 
         return Uri::fromAnyScheme($uri);
     }
 
-    public function authorizeProvider(
-        CallbackUri $callbackUri,
-        UriBuilder $uriBuilder,
-        string $code,
-    ): AuthorizedProvider {
-        $provider = $this->getOauthProvider($callbackUri, $uriBuilder);
+    public function authorizeProvider(CallbackUri $callbackUri, string $code): AuthorizedProvider
+    {
+        $provider = $this->getOauthProvider($callbackUri);
 
         $accessToken = $provider->getAccessToken('authorization_code', ['code' => $code]);
 
         return new AuthorizedProvider($accessToken, $provider);
     }
 
-    protected function getOauthProvider(CallbackUri $callbackUri, UriBuilder $uriBuilder): AbstractProvider
+    protected function getOauthProvider(CallbackUri $callbackUri): AbstractProvider
     {
         $options = $this->providerOptions;
-        $options['redirectUri'] = (string) $callbackUri->build($uriBuilder);
+        $options['redirectUri'] = (string) $callbackUri->build();
 
         $collaborators = [];
         if (!empty($this->collaborators['grantFactory'])) {

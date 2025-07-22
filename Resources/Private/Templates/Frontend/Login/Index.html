@@ -1,0 +1,17 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+      data-namespace-typo3-fluid="true"
+>
+    <f:form action="login" arguments="{loginType: 'login'}" requestToken="{requestToken}">
+        <ul>
+            <f:for each="{providers}" as="provider">
+                <li>
+                    <core:icon identifier="{provider.iconIdentifier}"/>
+                    <f:form.button name="providerIdentifier" value="{provider.hashedIdentifier}">
+                        <f:translate id="{provider.label}" default="{provider.label}"/>
+                    </f:form.button>
+                </li>
+            </f:for>
+        </ul>
+    </f:form>
+</html>

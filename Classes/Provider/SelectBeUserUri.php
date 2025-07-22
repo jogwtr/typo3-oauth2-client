@@ -12,9 +12,10 @@ readonly class SelectBeUserUri implements CallbackUri
 {
     public function __construct(
         public LockedSecurityObjects $securityObjects,
+        protected UriBuilder $uriBuilder,
     ) {}
 
-    public function build(UriBuilder $uriBuilder): Uri
+    public function build(): Uri
     {
         $params = [
             // The auth service to call
@@ -23,6 +24,6 @@ readonly class SelectBeUserUri implements CallbackUri
 
         $params = $this->securityObjects->addSecurityObjectsToParams($params);
 
-        return $uriBuilder->buildUriFromRoute('login', $params, UriBuilder::ABSOLUTE_URL);
+        return $this->uriBuilder->buildUriFromRoute('login', $params, UriBuilder::ABSOLUTE_URL);
     }
 }

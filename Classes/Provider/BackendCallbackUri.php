@@ -12,9 +12,10 @@ readonly class BackendCallbackUri implements CallbackUri
 {
     public function __construct(
         public LockedSecurityObjects $securityObjects,
+        protected UriBuilder $uriBuilder,
     ) {}
 
-    public function build(UriBuilder $uriBuilder): Uri
+    public function build(): Uri
     {
         $params = [
             // Required for TYPO3 to call our auth service directly after redirect
@@ -29,6 +30,6 @@ readonly class BackendCallbackUri implements CallbackUri
 
         $params = $this->securityObjects->addSecurityObjectsToParams($params);
 
-        return $uriBuilder->buildUriFromRoute('login', $params, UriBuilder::ABSOLUTE_URL);
+        return $this->uriBuilder->buildUriFromRoute('login', $params, UriBuilder::ABSOLUTE_URL);
     }
 }

@@ -69,7 +69,7 @@ class ProviderCollectionFactory implements LoggerAware
         if (!$settings['scope'] instanceof ProviderScope) {
             throw new ScopeNotInstanceOfProviderScopeException($identifier, $settings['scope']);
         }
-        if (!$providerScope->contains($settings['scope'])) {
+        if (!$settings['scope']->contains($providerScope)) {
             return null;
         }
         if (empty($settings['label'])) {
