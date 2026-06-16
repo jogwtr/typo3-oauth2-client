@@ -2,48 +2,52 @@
 
 declare(strict_types=1);
 
-namespace Waldhacker\Oauth2Client\Backend\UserSettingsModule;
+namespace Waldhacker\Oauth2Client\Backend\Form\RenderType;
 
-use Doctrine\DBAL\Exception;
+use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\IconSize;
-use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Waldhacker\Oauth2Client\Repository\BackendUserRepository;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
 
 /**
- * Renders the "manage / setup providers" button in the backend user settings module on TYPO3 v13,
- * where user settings of type "user" are rendered through a userFunc. TYPO3 v14 renders the same
- * field through the ManageProvidersButtonElement FormEngine node instead.
+ * Custom FormEngine element for the backend user settings module. Renders the status and the
+ * "manage / setup providers" button (formerly handled by the ManageProvidersButtonRenderer userFunc).
  */
-class ManageProvidersButtonRenderer
+class ManageProvidersButtonElement extends AbstractFormElement
 {
+
     public function __construct(
+        protected IconFactory $iconFactory,
         private readonly UriBuilder $uriBuilder,
         private readonly BackendUserRepository $backendUserRepository,
         private readonly Oauth2ProviderManager $oauth2ProviderManager,
-        private readonly IconFactory $iconFactory,
-        private readonly Context $context,
+        private readonly Context $context
     ) {
     }
 
     /**
+     * @return array<string, mixed>
      * @throws AspectNotFoundException
      * @throws RouteNotFoundException
-     * @throws Exception
      */
-    public function render(): string
+    public function render(): array
     {
-        $html = '';
+        $resultArray = $this->initializeResultArray();
+
         $languageFile = 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:';
         $lang = $this->getLanguageService();
-        $userid = (int)$this->context->getPropertyFromAspect('backend.user', 'id');
-        $activeProviders = $this->backendUserRepository->getActiveProviders($userid);
-        $hasActiveProviders = count($activeProviders) > 0;
+        $userId = (int)$this->context->getPropertyFromAspect('backend.user', 'id');
+        $activeProviders = $this->backendUserRepository->getActiveProviders($userId);
+        $hasActiveProviders = $activeProviders !== [];
+
+        $html = '';
+        $html .= $this->renderLabel('oauth2Providers');
         if ($hasActiveProviders) {
             $html .= ' <span class="badge badge-success">'
                 . htmlspecialchars($lang->sL($languageFile . 'oauth2Providers.enabled'), ENT_QUOTES | ENT_HTML5)
@@ -77,11 +81,8 @@ class ManageProvidersButtonRenderer
                 . '</span>';
             $html .= '</a>';
         }
-        return $html;
-    }
 
-    private function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'];
+        $resultArray['html'] = $html;
+        return $resultArray;
     }
 }
