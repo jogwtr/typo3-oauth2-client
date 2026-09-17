@@ -14,22 +14,22 @@ use Waldhacker\Oauth2Client\Database\Query\Restriction\Oauth2FeUserProviderConfi
 defined('TYPO3') || die();
 
 (static function () {
-    ExtensionManagementUtility::addService(
-        'oauth2_client',
-        'auth',
-        BackendAuthenticationService::class,
-        [
-            'title' => 'OAuth2 Authentication',
-            'description' => 'OAuth2 authentication for backend users',
-            'subtype' => 'getUserBE,authUserBE,processLoginDataBE',
-            'available' => true,
-            'priority' => 75,
-            'quality' => 50,
-            'os' => '',
-            'exec' => '',
-            'className' => BackendAuthenticationService::class
-        ]
-    );
+//    ExtensionManagementUtility::addService(
+//        'oauth2_client',
+//        'auth',
+//        BackendAuthenticationService::class,
+//        [
+//            'title' => 'OAuth2 Authentication',
+//            'description' => 'OAuth2 authentication for backend users',
+//            'subtype' => 'getUserBE,authUserBE,processLoginDataBE',
+//            'available' => true,
+//            'priority' => 75,
+//            'quality' => 50,
+//            'os' => '',
+//            'exec' => '',
+//            'className' => BackendAuthenticationService::class
+//        ]
+//    );
 
     ExtensionManagementUtility::addService(
         'oauth2_client',
@@ -55,12 +55,12 @@ defined('TYPO3') || die();
         [ManageProvidersController::class => 'list,deactivate']
     );
 
-    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][Oauth2LoginProvider::PROVIDER_ID] = [
-        'provider' => Oauth2LoginProvider::class,
-        'sorting' => 25,
-        'iconIdentifier' => 'actions-key',
-        'label' => 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:login.link',
-    ];
+//    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][Oauth2LoginProvider::PROVIDER_ID] = [
+//        'provider' => Oauth2LoginProvider::class,
+//        'sorting' => 25,
+//        'iconIdentifier' => 'actions-key',
+//        'label' => 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:login.link',
+//    ];
 
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1616684029] = [
         'nodeName' => 'oauth2providers',

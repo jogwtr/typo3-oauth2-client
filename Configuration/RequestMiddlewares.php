@@ -5,17 +5,17 @@ use Waldhacker\Oauth2Client\Middleware\Frontend\AfterAuthenticationHandler;
 use Waldhacker\Oauth2Client\Middleware\Frontend\BeforeAuthenticationHandler as FrontendBeforeAuthenticationHandler;
 
 return [
-    'backend' => [
-        'oauth2-before-authentication' => [
-            'target' => BackendBeforeAuthenticationHandler::class,
-            'before' => [
-                'typo3/cms-backend/authentication',
-            ],
-            'after' => [
-                'typo3/cms-backend/backend-routing',
-            ],
-        ],
-    ],
+//    'backend' => [
+//        'oauth2-before-authentication' => [
+//            'target' => BackendBeforeAuthenticationHandler::class,
+//            'before' => [
+//                'typo3/cms-backend/authentication',
+//            ],
+//            'after' => [
+//                'typo3/cms-backend/backend-routing',
+//            ],
+//        ],
+//    ],
     'frontend' => [
         'oauth2-before-authentication' => [
             'target' => FrontendBeforeAuthenticationHandler::class,

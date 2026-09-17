@@ -103,7 +103,7 @@ class FrontendAuthenticationService extends AbstractAuthenticationService
         return -100;
     }
 
-    public function processLoginData(array &$loginData, string $_): bool
+    public function processLoginData(array &$loginData): bool
     {
         $loginData['uname'] = $loginData['uname'] ?? '';
         $loginData['uident'] = $loginData['uident'] ?? '';

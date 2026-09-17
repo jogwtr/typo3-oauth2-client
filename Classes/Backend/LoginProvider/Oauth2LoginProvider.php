@@ -18,12 +18,14 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Backend\LoginProvider;
 
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\LoginController;
 use TYPO3\CMS\Backend\LoginProvider\LoginProviderInterface;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\View\ViewInterface;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
 
@@ -66,5 +68,13 @@ class Oauth2LoginProvider implements LoginProviderInterface
         $view->setTemplate($extensionConfiguration['view']['template'] ?? 'Oauth2LoginProvider');
 
         $view->assign('providers', $this->oauth2ProviderManager->getConfiguredBackendProviders());
+    }
+
+    public function modifyView(
+        ServerRequestInterface $request,
+        ViewInterface $view
+    ): string {
+        // TODO: Implement modifyView() method.
+        return 'Oauth2LoginProvider';
     }
 }
