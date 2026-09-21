@@ -85,7 +85,7 @@ class Oauth2ProviderManager
             throw new InvalidArgumentException('No such provider: ' . $providerId, 1642867944);
         }
         $provider = $this->providerConfigurations[$providerId];
-        $options = $provider->getOptions();
+        $options = $provider->getProviderOptions();
         if ($redirectUrl !== null) {
             $options['redirectUri'] = $redirectUrl;
         }

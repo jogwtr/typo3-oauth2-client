@@ -52,7 +52,8 @@ defined('TYPO3') || die();
         'oauth2Client',
         'ManageProviders',
         [ManageProvidersController::class => 'list,deactivate'],
-        [ManageProvidersController::class => 'list,deactivate']
+        [ManageProvidersController::class => 'list,deactivate'],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
 
 //    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][Oauth2LoginProvider::PROVIDER_ID] = [

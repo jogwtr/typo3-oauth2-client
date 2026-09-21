@@ -27,12 +27,12 @@ use Symfony\Component\HttpFoundation\Cookie;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Http\CookieHeaderTrait;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Security\JwtTrait;
 use TYPO3\CMS\Core\Session\Backend\Exception\SessionNotCreatedException;
 use TYPO3\CMS\Core\Session\UserSession;
 use TYPO3\CMS\Core\Session\UserSessionManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 class SessionManager
@@ -106,8 +106,8 @@ class SessionManager
         $cookieName = $this->getOAuth2CookieName($request);
         $sessionId = '';
         $cookieExpire = -1;
-        $cookieDomain = $this->getCookieDomain($requestType);
-        $sitePath = GeneralUtility::getIndpEnv('TYPO3_SITE_PATH');
+        $cookieDomain = $this->getCookieDomain($requestType, $request);
+        $sitePath = $this->getNormalizedParams($request)->getSitePath();
         $cookiePath = $cookieDomain ? '/' : (is_string($sitePath) ? $sitePath : '/');
 
         $cookie = new Cookie(
@@ -167,13 +167,14 @@ class SessionManager
         $cookieName = $this->getOAuth2CookieName($request);
         $sessionId = $this->getUserSession($requestType, $request)->getIdentifier();
         $cookieExpire = 0;
-        $cookieDomain = $this->getCookieDomain($requestType);
-        $sitePath = GeneralUtility::getIndpEnv('TYPO3_SITE_PATH');
+        $cookieDomain = $this->getCookieDomain($requestType, $request);
+        $normalizedParams = $this->getNormalizedParams($request);
+        $sitePath = $normalizedParams->getSitePath();
         $cookiePath = $cookieDomain ? '/' : (is_string($sitePath) ? $sitePath : '/');
         $cookieSameSite = $this->sanitizeSameSiteCookieValue(
             strtolower($GLOBALS['TYPO3_CONF_VARS'][$requestType]['cookieSameSite'] ?? Cookie::SAMESITE_STRICT)
         );
-        $isSecure = $cookieSameSite === Cookie::SAMESITE_NONE || GeneralUtility::getIndpEnv('TYPO3_SSL');
+        $isSecure = $cookieSameSite === Cookie::SAMESITE_NONE || $normalizedParams->isHttps();
 
         $sessionId = self::encodeHashSignedJwt(
             [
@@ -196,7 +197,7 @@ class SessionManager
         );
     }
 
-    private function getCookieDomain(string $requestType): string
+    private function getCookieDomain(string $requestType, ServerRequestInterface $request): string
     {
         $cookieDomain = empty($GLOBALS['TYPO3_CONF_VARS'][$requestType]['cookieDomain'])
             ? (string)$GLOBALS['TYPO3_CONF_VARS']['SYS']['cookieDomain']
@@ -207,8 +208,8 @@ class SessionManager
         }
 
         $match = [];
-        $host = GeneralUtility::getIndpEnv('TYPO3_HOST_ONLY');
-        $found = @preg_match($cookieDomain, (is_string($host) ? $host : ''), $match);
+        $host = $this->getNormalizedParams($request)->getRequestHostOnly();
+        $found = @preg_match($cookieDomain, $host, $match);
         return $found ? $match[0] : '';
     }
 
@@ -242,5 +243,13 @@ class SessionManager
             );
         }
         return $request;
+    }
+
+    private function getNormalizedParams(ServerRequestInterface $request): NormalizedParams
+    {
+        $normalizedParams = $request->getAttribute('normalizedParams');
+        return $normalizedParams instanceof NormalizedParams
+            ? $normalizedParams
+            : NormalizedParams::createFromRequest($request);
     }
 }

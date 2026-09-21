@@ -23,12 +23,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\Components\ComponentFactory;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -43,6 +43,7 @@ class ManageProvidersController extends AbstractBackendController
         private readonly UriBuilder $uriBuilder,
         private readonly IconFactory $iconFactory,
         private readonly ModuleTemplateFactory $moduleTemplateFactory,
+        private readonly ComponentFactory $componentFactory,
         private readonly Context $context,
     ) {
     }
@@ -73,20 +74,20 @@ class ManageProvidersController extends AbstractBackendController
         $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
         if (($returnUrl = $this->getReturnUrl($request)) !== '') {
-            $button = $buttonBar
-                ->makeLinkButton()
+            $button = $this->componentFactory
+                ->createLinkButton()
                 ->setHref($returnUrl)
-                ->setIcon($this->iconFactory->getIcon('actions-view-go-back', Icon::SIZE_SMALL))
+                ->setIcon($this->iconFactory->getIcon('actions-view-go-back', $this->smallIconSize()))
                 ->setTitle($this->getLanguageService()->sL($languageFile . 'labels.goBack'))
                 ->setShowLabelText(true);
             $buttonBar->addButton($button);
         }
 
-        $reloadButton = $buttonBar
-            ->makeLinkButton()
-            ->setHref($request->getAttribute('normalizedParams')->getRequestUri())
+        $reloadButton = $this->componentFactory
+            ->createLinkButton()
+            ->setHref($this->getCurrentRequestUri($request))
             ->setTitle($this->getLanguageService()->sL($languageFile . 'labels.reload'))
-            ->setIcon($this->iconFactory->getIcon('actions-refresh', Icon::SIZE_SMALL));
+            ->setIcon($this->iconFactory->getIcon('actions-refresh', $this->smallIconSize()));
         $buttonBar->addButton($reloadButton, ButtonBar::BUTTON_POSITION_RIGHT);
     }
 
@@ -104,12 +105,24 @@ class ManageProvidersController extends AbstractBackendController
         } else {
             $returnUrl = '';
         }
-        $returnUrl = GeneralUtility::sanitizeLocalUrl($returnUrl);
+        $returnUrl = GeneralUtility::sanitizeLocalUrl((string)$returnUrl, $request);
 
         if ($returnUrl === '' && ExtensionManagementUtility::isLoaded('setup')) {
             $returnUrl = (string)$this->uriBuilder->buildUriFromRoute('user_setup');
         }
 
         return $returnUrl;
+    }
+
+    private function getCurrentRequestUri(ServerRequestInterface $request): string
+    {
+        $uri = $request->getUri();
+        return $uri->getPath() . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
+    }
+
+    private function smallIconSize(): mixed
+    {
+        $iconSizeClass = 'TYPO3\\CMS\\Core\\Imaging\\IconSize';
+        return enum_exists($iconSizeClass) ? constant($iconSizeClass . '::SMALL') : 'small';
     }
 }

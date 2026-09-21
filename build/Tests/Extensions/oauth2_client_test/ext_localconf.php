@@ -7,7 +7,8 @@ defined('TYPO3') || die();
         'oauth2ClientTest',
         'ManageProviders',
         [\Waldhacker\Oauth2ClientTest\Controller\Frontend\ManageProvidersController::class => 'list'],
-        [\Waldhacker\Oauth2ClientTest\Controller\Frontend\ManageProvidersController::class => 'list']
+        [\Waldhacker\Oauth2ClientTest\Controller\Frontend\ManageProvidersController::class => 'list'],
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
 
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][\Waldhacker\Oauth2ClientTest\Backend\LoginProvider\Oauth2LoginProvider::PROVIDER_ID] = [

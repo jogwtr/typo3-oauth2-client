@@ -20,7 +20,6 @@ namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\FormHandling;
 
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Core\Utility\StringUtility;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\ExtendedInternalRequest;
 
 class DataPusher
@@ -109,7 +108,7 @@ class DataPusher
             parse_str(sprintf('%s=%s', $elementData['name'], $elementData['value'] ?? ''), $nameStruct);
             $postStructure = array_replace_recursive($postStructure, $nameStruct);
 
-            if (StringUtility::endsWith($elementData['name'], '[__state]')) {
+            if (str_ends_with($elementData['name'], '[__state]')) {
                 $prefix = key(ArrayUtility::flatten($nameStruct));
                 $prefixItems = explode('.', $prefix);
                 array_pop($prefixItems);

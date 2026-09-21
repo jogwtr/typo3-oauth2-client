@@ -29,6 +29,7 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Context\UserAspect;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Http\SetCookieService;
 use TYPO3\CMS\Core\Session\Backend\Exception\SessionNotCreatedException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
@@ -83,7 +84,7 @@ class AfterAuthenticationHandler implements MiddlewareInterface
             if (empty($originalRequestData)) {
                 $response = $this->responseFactory
                     ->createResponse(302, 'OAuth2: Done, but unable to find the original requested location')
-                    ->withHeader('location', $this->siteService->getBaseUri());
+                    ->withHeader('location', $this->siteService->getBaseUri($request));
 
                 return $this->sessionManager->appendRemoveOAuth2CookieToResponse($response, $request);
             }
@@ -118,7 +119,6 @@ class AfterAuthenticationHandler implements MiddlewareInterface
                 }
 
                 $subRequest = $subRequest->withCookieParams($_COOKIE ?? []);
-                $GLOBALS['TSFE'] = null;
 
                 $response = $this->performSubRequest($subRequest);
 
@@ -153,7 +153,12 @@ class AfterAuthenticationHandler implements MiddlewareInterface
             $userIsLoggedIn = $frontendUser instanceof FrontendUserAuthentication
                 && $frontendUserAspect->isLoggedIn();
             if ($userIsLoggedIn) {
-                $response = $request->getAttribute('frontend.user')->appendCookieToResponse($response, $request->getAttribute('normalizedParams'));
+                $response = SetCookieService::create($frontendUser->name, $frontendUser->loginType)->applyCookieToResponse(
+                    $response,
+                    $frontendUser->getSession(),
+                    $frontendUser->getCookieBehavior(),
+                    $request->getAttribute('normalizedParams')
+                );
             }
 
             return $this->sessionManager->appendRemoveOAuth2CookieToResponse($response, $request);
@@ -167,7 +172,7 @@ class AfterAuthenticationHandler implements MiddlewareInterface
                 )
             ) {
                 $GLOBALS['TYPO3_REQUEST'] = $request;
-                return $this->registrationController->handleRequest($request);
+                return $this->registrationController->processRequest($request);
             }
         }
 

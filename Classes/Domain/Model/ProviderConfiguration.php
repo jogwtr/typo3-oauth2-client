@@ -82,6 +82,11 @@ class ProviderConfiguration
 
     public function getOptions(): array
     {
+        return $this->getProviderOptions();
+    }
+
+    public function getProviderOptions(): array
+    {
         return $this->options;
     }
 

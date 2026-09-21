@@ -61,7 +61,7 @@ class RegistrationController implements LoggerAwareInterface
      * @throws SessionNotCreatedException
      * @throws AspectNotFoundException
      */
-    public function handleRequest(ServerRequestInterface $request): ResponseInterface
+    public function processRequest(ServerRequestInterface $request): ResponseInterface
     {
         $getParameters = $request->getQueryParams();
 
@@ -120,7 +120,7 @@ class RegistrationController implements LoggerAwareInterface
             $request
         );
         $warningRedirectUri = empty($originalRequestData)
-            ? $this->siteService->getBaseUri()
+            ? $this->siteService->getBaseUri($request)
             : $originalRequestData['uri'];
         if (empty($code) || empty($state)) {
             return $this->redirectWithWarning($warningRedirectUri, $request);
@@ -162,7 +162,7 @@ class RegistrationController implements LoggerAwareInterface
         if (empty($originalRequestData)) {
             $response = $this->responseFactory
                 ->createResponse(302, 'OAuth2: Done, but unable to find the original requested location')
-                ->withHeader('location', $this->siteService->getBaseUri());
+                ->withHeader('location', $this->siteService->getBaseUri($request));
         } else {
             $response = $this->responseFactory
                 ->createResponse(302, 'OAuth2: Done. Redirection to original requested location')
@@ -205,8 +205,8 @@ class RegistrationController implements LoggerAwareInterface
         }
 
         /** @var Site|null $site */
-        $site = $this->siteService->getSite();
-        $language = $this->siteService->getLanguage();
+        $site = $this->siteService->getSite($request);
+        $language = $this->siteService->getLanguage($request);
         if ($site === null || $language === null) {
             return false;
         }

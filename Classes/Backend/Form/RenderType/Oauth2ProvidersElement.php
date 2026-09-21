@@ -22,7 +22,6 @@ use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 use TYPO3\CMS\Backend\Form\NodeFactory;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
@@ -109,7 +108,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
                         . '" style="line-height: 2.1em;">';
                     $childHtml[] = $this->iconFactory->getIcon(
                         $activeProvider['providerConfiguration']->getIconIdentifier(),
-                        Icon::SIZE_SMALL
+                        $this->smallIconSize()
                     );
                     $childHtml[] = htmlspecialchars(
                         $lang->sL($activeProvider['providerConfiguration']->getLabel()),
@@ -126,7 +125,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
                                     ],
                                 ],
                             ],
-                            'redirect' => $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams')->getRequestUri(),
+                            'redirect' => $this->getCurrentRequestUri(),
                         ]
                     );
                     $childHtml[] = '<a href="' . $deleteThis . '" ';
@@ -166,7 +165,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
                                    ) .
                                    '"';
                     $childHtml[] = '>';
-                    $childHtml[] = $this->iconFactory->getIcon('actions-delete', Icon::SIZE_SMALL)->render('inline');
+                    $childHtml[] = $this->iconFactory->getIcon('actions-delete', $this->smallIconSize())->render('inline');
                     $childHtml[] = '</a>';
                     $childHtml[] = '</li>';
                 }
@@ -189,5 +188,21 @@ class Oauth2ProvidersElement extends AbstractFormElement
 
         $resultArray['html'] = $status . implode(PHP_EOL, $html);
         return $resultArray;
+    }
+
+    private function getCurrentRequestUri(): string
+    {
+        $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
+        if ($request instanceof \Psr\Http\Message\ServerRequestInterface) {
+            $uri = $request->getUri();
+            return $uri->getPath() . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
+        }
+        return '';
+    }
+
+    private function smallIconSize(): mixed
+    {
+        $iconSizeClass = 'TYPO3\\CMS\\Core\\Imaging\\IconSize';
+        return enum_exists($iconSizeClass) ? constant($iconSizeClass . '::SMALL') : 'small';
     }
 }

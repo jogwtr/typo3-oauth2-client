@@ -15,6 +15,7 @@
  */
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use Waldhacker\Oauth2Client\Backend\UserSettingsModule\ManageProvidersButtonRenderer;
 
 defined('TYPO3') or die();
 
@@ -34,4 +35,18 @@ defined('TYPO3') or die();
         ],
     ]);
     ExtensionManagementUtility::addToAllTCAtypes('be_users', 'tx_oauth2_client_configs', '', 'before:avatar');
+
+    if (method_exists(ExtensionManagementUtility::class, 'addUserSetting')) {
+        ExtensionManagementUtility::addUserSetting(
+            'tx_oauth2_client_configs',
+            [
+                'label' => 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:userSettings.label',
+                'config' => [
+                    'type' => 'user',
+                    'renderType' => ManageProvidersButtonRenderer::class . '->render',
+                ],
+            ],
+            'after:mfaProviders'
+        );
+    }
 })();

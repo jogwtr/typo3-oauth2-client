@@ -120,8 +120,8 @@ class ManageProvidersController extends ActionController
         }
 
         /** @var Site|null $site */
-        $site = $this->siteService->getSite();
-        $language = $this->siteService->getLanguage();
+        $site = $this->siteService->getSite($request);
+        $language = $this->siteService->getLanguage($request);
         if ($site === null || $language === null) {
             return false;
         }

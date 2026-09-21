@@ -24,7 +24,6 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use Waldhacker\Oauth2Client\Repository\BackendUserRepository;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
@@ -72,7 +71,7 @@ class ManageProvidersButtonRenderer
                     ENT_QUOTES | ENT_HTML5
                 )
                 . '" class="btn btn-' . ($activeProviders ? 'default' : 'success') . '">';
-            $html .= $this->iconFactory->getIcon($hasActiveProviders ? 'actions-cog' : 'actions-add', Icon::SIZE_SMALL);
+            $html .= $this->iconFactory->getIcon($hasActiveProviders ? 'actions-cog' : 'actions-add', $this->smallIconSize());
             $html .= ' <span>'
                 . htmlspecialchars(
                     $lang->sL(
@@ -89,5 +88,11 @@ class ManageProvidersButtonRenderer
     private function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
+    }
+
+    private function smallIconSize(): mixed
+    {
+        $iconSizeClass = 'TYPO3\\CMS\\Core\\Imaging\\IconSize';
+        return enum_exists($iconSizeClass) ? constant($iconSizeClass . '::SMALL') : 'small';
     }
 }

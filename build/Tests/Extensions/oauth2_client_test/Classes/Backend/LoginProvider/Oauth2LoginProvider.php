@@ -18,17 +18,33 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2ClientTest\Backend\LoginProvider;
 
-use TYPO3\CMS\Backend\Controller\LoginController;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\LoginProvider\LoginProviderInterface;
-use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Core\View\ViewInterface;
 
 class Oauth2LoginProvider implements LoginProviderInterface
 {
     public const PROVIDER_ID = '1616569532';
 
-    public function render(StandaloneView $view, PageRenderer $pageRenderer, LoginController $loginController)
+    public function render($view, $pageRenderer, $loginController)
     {
-        $view->setTemplatePathAndFilename('EXT:oauth2_client_test/Resources/Private/Templates/Backend/Oauth2LoginProvider.html');
+        if (method_exists($view, 'setTemplatePathAndFilename')) {
+            $view->setTemplatePathAndFilename('EXT:oauth2_client_test/Resources/Private/Templates/Backend/Oauth2LoginProvider.html');
+        }
+    }
+
+    public function modifyView(ServerRequestInterface $request, ViewInterface $view): string
+    {
+        if (method_exists($view, 'getRenderingContext')) {
+            $templatePaths = $view->getRenderingContext()->getTemplatePaths();
+            if (method_exists($templatePaths, 'getTemplateRootPaths') && method_exists($templatePaths, 'setTemplateRootPaths')) {
+                $templatePaths->setTemplateRootPaths(array_merge(
+                    $templatePaths->getTemplateRootPaths(),
+                    ['EXT:oauth2_client_test/Resources/Private/Templates/']
+                ));
+            }
+        }
+
+        return 'Backend/Oauth2LoginProvider';
     }
 }

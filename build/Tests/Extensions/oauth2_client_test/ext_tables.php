@@ -3,14 +3,15 @@
 defined('TYPO3') || die();
 
 (static function () {
-    $GLOBALS['TYPO3_USER_SETTINGS']['columns']['tx_oauth2_test_client_configs'] = [
-        'label' => '',
-        'type' => 'user',
-        'userFunc' => \Waldhacker\Oauth2ClientTest\Backend\UserSettingsModule\ManageProvidersButtonRenderer::class . '->render',
-    ];
-
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addFieldsToUserSettings(
+    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserSetting(
         'tx_oauth2_test_client_configs',
+        [
+            'label' => '',
+            'config' => [
+                'type' => 'user',
+                'renderType' => \Waldhacker\Oauth2ClientTest\Backend\UserSettingsModule\ManageProvidersButtonRenderer::class . '->render',
+            ],
+        ],
         'after:mfaProviders'
     );
 })();

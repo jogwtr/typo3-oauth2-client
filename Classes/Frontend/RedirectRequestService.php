@@ -20,7 +20,6 @@ namespace Waldhacker\Oauth2Client\Frontend;
 
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Core\Configuration\Features;
 use TYPO3\CMS\Core\Http\Uri;
 use Waldhacker\Oauth2Client\Service\SiteService;
 
@@ -28,7 +27,7 @@ class RedirectRequestService
 {
     private const REDIRECT_URI_QUERY_NAME = 'after-oauth2-redirect-uri';
 
-    public function __construct(private readonly SiteService $siteService, private readonly Features $features)
+    public function __construct(private readonly SiteService $siteService)
     {
     }
 
@@ -40,7 +39,7 @@ class RedirectRequestService
         );
 
         if (
-            !$this->features->isFeatureEnabled('oauth2.frontend.login.afterOauth2RedirectUriFromQuery')
+            !$this->isRedirectUriOverrideEnabled()
             || !$tryOverrideFromQuery
             || empty($mergedRequestedParameters[self::REDIRECT_URI_QUERY_NAME])
         ) {
@@ -83,6 +82,11 @@ class RedirectRequestService
         $uri = $uri->withQuery(http_build_query($queryParameters));
 
         return (string)$uri;
+    }
+
+    private function isRedirectUriOverrideEnabled(): bool
+    {
+        return ($GLOBALS['TYPO3_CONF_VARS']['SYS']['features']['oauth2.frontend.login.afterOauth2RedirectUriFromQuery'] ?? false) === true;
     }
 
     private function isSameSite(Uri $redirectUri, ServerRequestInterface $request): bool

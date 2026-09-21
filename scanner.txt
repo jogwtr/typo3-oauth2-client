@@ -1,0 +1,415 @@
+
+Extension: oauth2_client
+Checked 94 of 94 files
+Classes/Authentication/FrontendAuthenticationService.php
+Call to method "getSite()"
+weak
+
+176: $site = $this->siteService->getSite();
+
+Breaking: #102621 - Most TSFE members marked internal or read-only
+13.0
+Classes/Authentication/FrontendAuthenticationService.php
+Call to method "getLanguage()"
+weak
+
+177: $language = $this->siteService->getLanguage();
+
+Breaking: #102621 - Most TSFE members marked internal or read-only
+13.0
+Classes/Backend/LoginProvider/Oauth2LoginProvider.php
+Usage of class "TYPO3\CMS\Fluid\View\StandaloneView"
+strong
+
+46: public function render(StandaloneView $view, PageRenderer $pageRenderer, LoginController $loginController): void
+
+Deprecation: #104773 - Custom Fluid views and Extbase
+13.3
+Breaking: #105377 - Deprecated functionality removed
+14.0
+Classes/Backend/UserSettingsModule/ManageProvidersButtonRenderer.php
+Call to class constant "TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL"
+strong
+
+75: $html .= $this->iconFactory->getIcon($hasActiveProviders ? 'actions-cog' : 'actions-add', Icon::SIZE_SMALL);
+
+Deprecation: #101475 - Icon::SIZE_* string constants
+13.0
+Breaking: #105377 - Deprecated functionality removed
+14.0
+Classes/Backend/Form/RenderType/Oauth2ProvidersElement.php
+Call to class constant "TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL"
+strong
+
+112: Icon::SIZE_SMALL
+
+Deprecation: #101475 - Icon::SIZE_* string constants
+13.0
+Breaking: #105377 - Deprecated functionality removed
+14.0
+Classes/Backend/Form/RenderType/Oauth2ProvidersElement.php
+Call to class constant "TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL"
+strong
+
+169: $childHtml[] = $this->iconFactory->getIcon('actions-delete', Icon::SIZE_SMALL)->render('inline');
+
+Deprecation: #101475 - Icon::SIZE_* string constants
+13.0
+Breaking: #105377 - Deprecated functionality removed
+14.0
+Classes/Backend/Form/RenderType/Oauth2ProvidersElement.php
+Call to method "getRequestUri()"
+weak
+
+129: 'redirect' => $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams')->getRequestUri(),
+
+Deprecation: #94228 - Extbase request getRequestUri()
+11.3
+Breaking: #96107 - Deprecated functionality removed
+12.0
+Classes/Controller/Backend/Registration/AuthorizeController.php
+Usage of class "TYPO3\CMS\Fluid\View\StandaloneView"
+strong
+
+118: $view = GeneralUtility::makeInstance(StandaloneView::class);
+
+Deprecation: #104773 - Custom Fluid views and Extbase
+13.3
+Breaking: #105377 - Deprecated functionality removed
+14.0
+Classes/Controller/Frontend/ManageProvidersController.php
+Call to method "getSite()"
+weak
+
+123: $site = $this->siteService->getSite();
+
+Breaking: #102621 - Most TSFE members marked internal or read-only
+13.0
+Classes/Controller/Frontend/ManageProvidersController.php
+Call to method "getLanguage()"
+weak
+
+124: $language = $this->siteService->getLanguage();
+
+Breaking: #102621 - Most TSFE members marked internal or read-only
+13.0
+Classes/Controller/Backend/ManageProvidersController.php
+Call to class constant "TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL"
+strong
+
+79: ->setIcon($this->iconFactory->getIcon('actions-view-go-back', Icon::SIZE_SMALL))
+
+Deprecation: #101475 - Icon::SIZE_* string constants
+13.0
+Breaking: #105377 - Deprecated functionality removed
+14.0
+Classes/Controller/Backend/ManageProvidersController.php
+Call to class constant "TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL"
+strong
+
+89: ->setIcon($this->iconFactory->getIcon('actions-refresh', Icon::SIZE_SMALL));
+
+Deprecation: #101475 - Icon::SIZE_* string constants
+13.0
+Breaking: #105377 - Deprecated functionality removed
+14.0
+Classes/Controller/Backend/ManageProvidersController.php
+Method "sanitizeLocalUrl()" needs at least 2 arguments.
+strong
+
+107: $returnUrl = GeneralUtility::sanitizeLocalUrl($returnUrl);
+
+Breaking: #101311 - Make the parameter for GeneralUtility::sanitizeLocalUrl required
+13.0
+Deprecation: #109544 - GeneralUtility::sanitizeLocalUrl() needs PSR-7 request
+14.3
+Classes/Controller/Backend/ManageProvidersController.php
+Call to method "makeLinkButton()"
+weak
+
+76: $button = $buttonBar
+
+Deprecation: #107823 - ButtonBar, Menu, and MenuRegistry make* methods deprecated
+14.0
+Classes/Controller/Backend/ManageProvidersController.php
+Call to method "makeLinkButton()"
+weak
+
+85: $reloadButton = $buttonBar
+
+Deprecation: #107823 - ButtonBar, Menu, and MenuRegistry make* methods deprecated
+14.0
+Classes/Controller/Backend/ManageProvidersController.php
+Call to method "getRequestUri()"
+weak
+
+87: ->setHref($request->getAttribute('normalizedParams')->getRequestUri())
+
+Deprecation: #94228 - Extbase request getRequestUri()
+11.3
+Breaking: #96107 - Deprecated functionality removed
+12.0
+Classes/Controller/Frontend/RegistrationController.php
+Call to method "getBaseUri()"
+weak
+
+123: ? $this->siteService->getBaseUri()
+
+Deprecation: #94223 - Extbase Request->getBaseUri()
+11.3
+Breaking: #96107 - Deprecated functionality removed
+12.0
+Classes/Controller/Frontend/RegistrationController.php
+Call to method "getBaseUri()"
+weak
+
+165: ->withHeader('location', $this->siteService->getBaseUri());
+
+Deprecation: #94223 - Extbase Request->getBaseUri()
+11.3
+Breaking: #96107 - Deprecated functionality removed
+12.0
+Classes/Controller/Frontend/RegistrationController.php
+Call to method "getSite()"
+weak
+
+208: $site = $this->siteService->getSite();
+
+Breaking: #102621 - Most TSFE members marked internal or read-only
+13.0
+Classes/Controller/Frontend/RegistrationController.php
+Call to method "getLanguage()"
+weak
+
+209: $language = $this->siteService->getLanguage();
+
+Breaking: #102621 - Most TSFE members marked internal or read-only
+13.0
+Classes/Frontend/RedirectRequestService.php
+Call to method "isFeatureEnabled()"
+weak
+
+43: !$this->features->isFeatureEnabled('oauth2.frontend.login.afterOauth2RedirectUriFromQuery')
+
+Deprecation: #100622 - Extbase feature toggles
+12.4
+Breaking: #100963 - Deprecated functionality removed
+13.0
+Classes/Service/Oauth2ProviderManager.php
+Call to method "getOptions()"
+weak
+
+88: $options = $provider->getOptions();
+
+Deprecation: #85804 - Salted password hash class deprecations
+9.4
+Breaking: #87193 - Deprecated functionality removed
+10.0
+Classes/Middleware/Frontend/AfterAuthenticationHandler.php
+Access to array global array "TSFE"
+strong
+
+121: $GLOBALS['TSFE'] = null;
+
+Deprecation: #105230 - TypoScriptFrontendController and $GLOBALS['TSFE']
+13.4
+Classes/Middleware/Frontend/AfterAuthenticationHandler.php
+Call to method "getBaseUri()"
+weak
+
+86: ->withHeader('location', $this->siteService->getBaseUri());
+
+Deprecation: #94223 - Extbase Request->getBaseUri()
+11.3
+Breaking: #96107 - Deprecated functionality removed
+12.0
+Classes/Middleware/Frontend/AfterAuthenticationHandler.php
+Call to method "getSession()"
+weak
+
+112: $sessionId = $request->getAttribute('frontend.user')->getSession()->getIdentifier();
+
+Important: #89938 - Removed dead code from Extbase persistence
+11.0
+Classes/Middleware/Frontend/AfterAuthenticationHandler.php
+Call to method "appendCookieToResponse()"
+weak
+
+156: $response = $request->getAttribute('frontend.user')->appendCookieToResponse($response, $request->getAttribute('normalizedParams'));
+
+Deprecation: #100173 - Various methods and properties in UserAuthentication classes now internal
+12.4
+Breaking: #100963 - Deprecated functionality removed
+13.0
+Classes/Middleware/Frontend/AfterAuthenticationHandler.php
+Call to method "handleRequest()"
+weak
+
+170: return $this->registrationController->handleRequest($request);
+
+Important: #83869 - Removed request type specific code in Bootstrap
+9.2
+Classes/Session/SessionManager.php
+Use of static class method call "TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv()"
+strong
+
+110: $sitePath = GeneralUtility::getIndpEnv('TYPO3_SITE_PATH');
+
+Deprecation: #109551 - GeneralUtility::getIndpEnv()
+14.3
+Classes/Session/SessionManager.php
+Use of static class method call "TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv()"
+strong
+
+171: $sitePath = GeneralUtility::getIndpEnv('TYPO3_SITE_PATH');
+
+Deprecation: #109551 - GeneralUtility::getIndpEnv()
+14.3
+Classes/Session/SessionManager.php
+Use of static class method call "TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv()"
+strong
+
+176: $isSecure = $cookieSameSite === Cookie::SAMESITE_NONE || GeneralUtility::getIndpEnv('TYPO3_SSL');
+
+Deprecation: #109551 - GeneralUtility::getIndpEnv()
+14.3
+Classes/Session/SessionManager.php
+Use of static class method call "TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv()"
+strong
+
+210: $host = GeneralUtility::getIndpEnv('TYPO3_HOST_ONLY');
+
+Deprecation: #109551 - GeneralUtility::getIndpEnv()
+14.3
+Classes/Updates/RenameClientConfigsTableUpdateWizard20220122130120.php
+Usage of class "TYPO3\CMS\Install\Attribute\UpgradeWizard"
+strong
+
+32: #[UpgradeWizard('oauth2_client_RenameClientConfigsTableUpdateWizard20220122130120')]
+
+Deprecation: #106947 - Move upgrade wizard related interfaces and attribute to `EXT:core`
+14.0
+Classes/Updates/RenameClientConfigsTableUpdateWizard20220122130120.php
+Usage of class "TYPO3\CMS\Install\Updates\UpgradeWizardInterface"
+strong
+
+33: class RenameClientConfigsTableUpdateWizard20220122130120 implements UpgradeWizardInterface, ChattyInterface
+
+Deprecation: #106947 - Move upgrade wizard related interfaces and attribute to `EXT:core`
+14.0
+Classes/Updates/RenameClientConfigsTableUpdateWizard20220122130120.php
+Usage of class "TYPO3\CMS\Install\Updates\ChattyInterface"
+strong
+
+33: class RenameClientConfigsTableUpdateWizard20220122130120 implements UpgradeWizardInterface, ChattyInterface
+
+Deprecation: #106947 - Move upgrade wizard related interfaces and attribute to `EXT:core`
+14.0
+Classes/Updates/RenameClientConfigsTableUpdateWizard20220122130120.php
+Usage of class "TYPO3\CMS\Install\Updates\DatabaseUpdatedPrerequisite"
+strong
+
+104: DatabaseUpdatedPrerequisite::class
+
+Deprecation: #106947 - Move upgrade wizard related interfaces and attribute to `EXT:core`
+14.0
+Tests/Functional/Framework/FormHandling/DataPusher.php
+Use of static class method call "TYPO3\CMS\Core\Utility\StringUtility::endsWith()"
+strong
+
+112: if (StringUtility::endsWith($elementData['name'], '[__state]')) {
+
+Deprecation: #95293 - StringUtility::beginsWith() and StringUtility::endsWith()
+11.5
+Breaking: #96107 - Deprecated functionality removed
+12.0
+build/Tests/Extensions/json_response/Classes/Middleware/BackendUserHandler.php
+Call to method "getWorkspaceId()"
+weak
+
+70: if (!empty($context->getWorkspaceId())) {
+
+Breaking: #93080 - RelationHandler internals protected
+11.0
+build/Tests/Extensions/json_response/Classes/Middleware/BackendUserHandler.php
+Call to method "getWorkspaceId()"
+weak
+
+71: $backendUser->setTemporaryWorkspace($context->getWorkspaceId());
+
+Breaking: #93080 - RelationHandler internals protected
+11.0
+build/Tests/Extensions/oauth2_client_test/Classes/Backend/LoginProvider/Oauth2LoginProvider.php
+Usage of class "TYPO3\CMS\Fluid\View\StandaloneView"
+strong
+
+30: public function render(StandaloneView $view, PageRenderer $pageRenderer, LoginController $loginController)
+
+Deprecation: #104773 - Custom Fluid views and Extbase
+13.3
+Breaking: #105377 - Deprecated functionality removed
+14.0
+build/Tests/Extensions/oauth2_client_test/Configuration/TCA/Overrides/tt_content.php
+Use of static class method call "TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue()"
+strong
+
+14: \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
+
+Deprecation: #107047 - ExtensionManagementUtility::addPiFlexFormValue()
+14.0
+build/Tests/Extensions/oauth2_client_test/ext_localconf.php
+Method "configurePlugin()" needs at least 5 arguments.
+strong
+
+6: \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+
+Deprecation: #105076 - Plugin content element and plugin sub types
+13.4
+Important: #105538 - Plugin subtypes removed: Changes to configurePlugin() and TCA handling
+14.0
+build/Tests/Extensions/oauth2_client_test/ext_tables.php
+Access to array global array "TYPO3_USER_SETTINGS"
+strong
+
+6: $GLOBALS['TYPO3_USER_SETTINGS']['columns']['tx_oauth2_test_client_configs'] = [
+
+Deprecation: #108843 - ExtensionManagementUtility::addFieldsToUserSettings
+14.2
+build/Tests/Extensions/oauth2_client_test/ext_tables.php
+Use of static class method call "TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addFieldsToUserSettings()"
+strong
+
+12: \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addFieldsToUserSettings(
+
+Deprecation: #108843 - ExtensionManagementUtility::addFieldsToUserSettings
+14.2
+ext_localconf.php
+Method "configurePlugin()" needs at least 5 arguments.
+strong
+
+51: ExtensionUtility::configurePlugin(
+
+Deprecation: #105076 - Plugin content element and plugin sub types
+13.4
+Important: #105538 - Plugin subtypes removed: Changes to configurePlugin() and TCA handling
+14.0
+ext_tables.php
+Access to array global array "TYPO3_USER_SETTINGS"
+strong
+
+9: $GLOBALS['TYPO3_USER_SETTINGS']['columns']['tx_oauth2_client_configs'] = [
+
+Deprecation: #108843 - ExtensionManagementUtility::addFieldsToUserSettings
+14.2
+ext_tables.php
+Use of static class method call "TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addFieldsToUserSettings()"
+strong
+
+15: ExtensionManagementUtility::addFieldsToUserSettings(
+
+Deprecation: #108843 - ExtensionManagementUtility::addFieldsToUserSettings
+14.2
+
+Effective lines of code: 6795
+Files ignored by scanner: 0
+Code lines ignored by scanner: 0
