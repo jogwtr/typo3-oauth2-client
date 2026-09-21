@@ -1,0 +1,23 @@
+categories:
+  oauth2Client:
+    label: 'OAuth2 Client'
+  oauth2Client.view:
+    label: 'View'
+    parent: oauth2Client
+
+settings:
+  plugin.tx_oauth2client.view.templateRootPath:
+    label: 'Path to template root (FE)'
+    category: oauth2Client.view
+    type: string
+    default: 'EXT:oauth2_client/Resources/Private/Templates/'
+  plugin.tx_oauth2client.view.partialRootPath:
+    label: 'Path to template partials (FE)'
+    category: oauth2Client.view
+    type: string
+    default: 'EXT:oauth2_client/Resources/Private/Partials/'
+  plugin.tx_oauth2client.view.layoutRootPath:
+    label: 'Path to template layouts (FE)'
+    category: oauth2Client.view
+    type: string
+    default: 'EXT:oauth2_client/Resources/Private/Layouts/'

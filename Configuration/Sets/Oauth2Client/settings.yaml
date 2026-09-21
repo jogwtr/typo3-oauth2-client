@@ -1,0 +1,4 @@
+settings:
+  plugin.tx_oauth2client.view.templateRootPath: 'EXT:oauth2_client/Resources/Private/Templates/'
+  plugin.tx_oauth2client.view.partialRootPath: 'EXT:oauth2_client/Resources/Private/Partials/'
+  plugin.tx_oauth2client.view.layoutRootPath: 'EXT:oauth2_client/Resources/Private/Layouts/'

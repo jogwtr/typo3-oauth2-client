@@ -149,9 +149,25 @@ class Oauth2ProviderManager
 
         $siteConfiguration = $site->getConfiguration();
         $languageConfiguration = $language->toArray();
-        $enabledProviderIds = empty($languageConfiguration['enabled_oauth2_providers'])
-              ? GeneralUtility::trimExplode(',', $siteConfiguration['enabled_oauth2_providers'] ?? '')
-              : GeneralUtility::trimExplode(',', $languageConfiguration['enabled_oauth2_providers']);
+        $siteOauthProviders = [];
+        $languageOauthProviders = [];
+        if (!empty($siteConfiguration['enabled_oauth2_providers'])) {
+            if (is_string($siteConfiguration['enabled_oauth2_providers'])) {
+                $siteOauthProviders = GeneralUtility::trimExplode(',', $siteConfiguration['enabled_oauth2_providers']);
+            } else {
+                $siteOauthProviders = $siteConfiguration['enabled_oauth2_providers'];
+            }
+        }
+        if (!empty($languageConfiguration['enabled_oauth2_providers'])) {
+            if (is_string($languageConfiguration['enabled_oauth2_providers'])) {
+                $languageOauthProviders = GeneralUtility::trimExplode(',', $languageConfiguration['enabled_oauth2_providers']);
+            } else {
+                $languageOauthProviders = $languageConfiguration['enabled_oauth2_providers'];
+            }
+        }
+        $enabledProviderIds = empty($languageOauthProviders)
+              ? $siteOauthProviders
+              : $languageOauthProviders;
 
         $configuredEnabledProviders = array_filter(
             $this->getConfiguredFrontendProviders() ?? [],

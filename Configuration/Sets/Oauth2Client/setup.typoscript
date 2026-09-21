@@ -1,0 +1,1 @@
+@import 'EXT:oauth2_client/Configuration/TypoScript/setup.typoscript'
